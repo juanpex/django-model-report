@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from decimal import Decimal
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import force_unicode

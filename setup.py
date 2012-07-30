@@ -1,21 +1,24 @@
 # -*- coding: utf-8 -*-
-"""Setup file for easy installation"""
 from os.path import join, dirname
 from setuptools import setup
 
 
 version = __import__('model_report').__version__
 
+
 LONG_DESCRIPTION = """
-Django reports integrated with highcharts.
+django-model-report
+===================
+
+django reports integrated with highcharts
+
+    $ git clone git://github.com/juanpex/django-model-report.git
 """
 
 
 def long_description():
-    """Return long description from README.rst if it's present
-    because it doesn't get installed."""
     try:
-        return open(join(dirname(__file__), 'README.rst')).read()
+        return open(join(dirname(__file__), 'README.md')).read()
     except IOError:
         return LONG_DESCRIPTION
 

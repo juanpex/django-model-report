@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import cStringIO as StringIO
 import ho.pisa as pisa
 from django.template.loader import get_template

@@ -2,7 +2,7 @@
 from django.utils.translation import ugettext_lazy as _
 from app.models import Population, BrowserDownload
 
-from model_report import reports, ReportAdmin
+from model_report.report import reports, ReportAdmin
 from model_report.utils import (avg_column, sum_column, count_column)
 
 

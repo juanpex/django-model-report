@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from model_report.highcharts.base import true, false, null, DictObject
 from model_report.highcharts.options import get_highchart_data
 

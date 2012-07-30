@@ -14,6 +14,31 @@ from model_report.highcharts import HighchartRender
 from model_report.widgets import RangeField
 from model_report.export_pdf import render_to_pdf
 
+
+class ReportInstanceManager(object):
+
+    _register = {}
+
+    def __init__(self):
+        self._register = {}
+
+    def register(self, slug, rclass):
+        if slug in self._register:
+            raise ValueError('Slug already exists: %s' % slug)
+        report = rclass()
+        setattr(report, 'slug', slug)
+        self._register[slug] = report
+
+    def get_report(self, slug):
+        return self._register.get(slug, None)
+
+    def get_reports(self):
+        return self._register.values()
+
+
+reports = ReportInstanceManager()
+
+
 _cache_class = {}
 
 

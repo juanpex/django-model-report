@@ -1,8 +1,9 @@
+# -*- coding: utf-8 -*-
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.http import Http404
 
-from model_report import reports
+from model_report.report import reports
 
 
 def report_list(request):

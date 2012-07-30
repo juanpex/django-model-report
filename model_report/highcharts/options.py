@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from model_report.highcharts.base import true, false, null, Solid, outside, undefined, _, CollectionObject, DictObject
 
 

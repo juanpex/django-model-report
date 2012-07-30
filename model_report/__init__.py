@@ -1,25 +1,12 @@
-from model_report.report import ReportAdmin
+VERSION = (0, 0, 1, 'alpha')
 
+# Dynamically calculate the version based on VERSION tuple
+if len(VERSION) > 2 and VERSION[2] is not None:
+    if isinstance(VERSION[2], int):
+        str_version = "%s.%s.%s" % VERSION[:3]
+    else:
+        str_version = "%s.%s_%s" % VERSION[:3]
+else:
+    str_version = "%s.%s" % VERSION[:2]
 
-class ReportInstanceManager(object):
-
-    _register = {}
-
-    def __init__(self):
-        self._register = {}
-
-    def register(self, slug, rclass):
-        if slug in self._register:
-            raise ValueError('Slug already exists: %s' % slug)
-        report = rclass()
-        setattr(report, 'slug', slug)
-        self._register[slug] = report
-
-    def get_report(self, slug):
-        return self._register.get(slug, None)
-
-    def get_reports(self):
-        return self._register.values()
-
-
-reports = ReportInstanceManager()
+__version__ = str_version
