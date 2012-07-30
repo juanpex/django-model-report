@@ -3,6 +3,14 @@ from model_report.highcharts.base import true, false, null, DictObject
 from model_report.highcharts.options import get_highchart_data
 
 
+def is_numeric(value):
+    try:
+        float(value)
+    except (ValueError, TypeError):
+        return False
+    return True
+
+
 class HighchartRender(object):
 
     def reset(self):
@@ -34,7 +42,10 @@ class HighchartRender(object):
                 serie_values = []
                 for r in rows:
                     if r.is_value():
-                        serie_values.append(r[self.config['serie_field']].value)
+                        value = r[self.config['serie_field']].value
+                        if not is_numeric(value):
+                            value = 1  # TOOD: Map serie_field with posible serie_operator
+                        serie_values.append(value)
 
                 value = serie_operation(serie_values)
 
