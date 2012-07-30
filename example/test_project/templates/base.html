@@ -1,0 +1,73 @@
+{% load i18n %}<!DOCTYPE HTML>
+<html>
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    <link href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" rel="stylesheet">
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+      .sidebar-nav {
+        padding: 9px 0;
+      }
+      fieldset {
+        float: left;
+        width: 300px;
+      }
+      .actions {
+        float: left;
+        clear: both;
+      }
+      p.row {
+        margin-left: 0px;
+      }
+      .caption, .caption:hover {
+        font-weight: bold !important;
+        background: #EEE !important;
+      }
+      .grouper, .grouper:hover {
+        background: #333 !important;
+        color: #EEE !important;
+      }
+      #forkme {position: fixed; top: 0; right: 0; z-index: 10000;}
+    </style>
+    <link href="http://twitter.github.com/bootstrap/assets/css/bootstrap-responsive.css" rel="stylesheet">
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    {% block head_extra %}
+    {% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}">
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <a class="brand" href="/">django-model-report</a>
+        </div>
+      </div>
+    </div>
+
+<div class="container-fluid">
+    {% block container %}
+    <div class="row-fluid">
+        <div class="span3">
+          <div class="well sidebar-nav">
+            <ul class="nav nav-list">
+              <li class="nav-header">{% trans "Report list" %}</li>
+              {% block sidebar %}
+              {% endblock %}
+            </ul>
+          </div>
+        </div>
+        <div class="span9">
+        {% block content %}
+        {% endblock %}
+        </div>
+    </div>
+    {% endblock %}
+</div>
+
+<a href="https://github.com/juanpex/django-model-report"><img style="position: fixed; top: 0; right: 0; border: 0; z-index: 10000;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_orange_ff7600.png" alt="Fork me on GitHub"></a>
+</body>
+</html>

@@ -1,0 +1,104 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: app\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-07-29 23:14-0300\n"
+"PO-Revision-Date: 2012-07-29 23:14-0300\n"
+"Last-Translator: Juan Pablo Martínez <jpma55@gmail.com>\n"
+"Language-Team: juanpex <jpma55@gmail.com>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"X-Poedit-Language: Spanish\n"
+
+#: models.py:10
+msgid "Age"
+msgstr "Edad"
+
+#: models.py:11
+msgid "Men"
+msgstr "Hombres"
+
+#: models.py:12
+msgid "Women"
+msgstr "Mujeres"
+
+#: models.py:18
+msgid "Population"
+msgstr "Población"
+
+#: models.py:19
+msgid "Populations"
+msgstr "Poblaciones"
+
+#: models.py:26
+#: models.py:37
+msgid "Name"
+msgstr "Nombre"
+
+#: models.py:29
+msgid "Browser"
+msgstr "Navegador"
+
+#: models.py:30
+msgid "Browsers"
+msgstr "Navegadores"
+
+#: models.py:40
+msgid "OS"
+msgstr "SO:"
+
+#: models.py:41
+msgid "OS's"
+msgstr "SO's"
+
+#: models.py:48
+msgid "Download date"
+msgstr "Fecha de descarga"
+
+#: models.py:51
+msgid "Username"
+msgstr "Nombre de usuario"
+
+#: models.py:54
+msgid "Browser Download"
+msgstr "Descarga de Navegador"
+
+#: models.py:55
+msgid "Browser Downloads"
+msgstr "Descargas de Navegadores"
+
+#: reports.py:10
+#, python-format
+msgid "M %s"
+msgstr "H %s"
+
+#: reports.py:14
+#, python-format
+msgid "F %s"
+msgstr "M %s"
+
+#: reports.py:18
+msgid "Mens"
+msgstr "Hombres"
+
+#: reports.py:55
+msgid "[Browser] Name"
+msgstr "[Navegador] Nombre"
+
+#: reports.py:59
+msgid "[OS] Name"
+msgstr "[SO] Nombre"
+
+#~ msgid "Men's"
+#~ msgstr "Hombres"
+
+#~ msgid "name"
+#~ msgstr "nombre"
