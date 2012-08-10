@@ -10,6 +10,21 @@ def is_numeric(value):
         return False
     return True
 
+from BeautifulSoup import BeautifulStoneSoup
+import cgi
+
+
+def HTMLEntitiesToUnicode(text):
+    """Converts HTML entities to unicode.  For example '&amp;' becomes '&'."""
+    text = unicode(BeautifulStoneSoup(text, convertEntities=BeautifulStoneSoup.ALL_ENTITIES))
+    return text
+
+
+def unicodeToHTMLEntities(text):
+    """Converts unicode to HTML entities.  For example '&' becomes '&amp;'."""
+    text = cgi.escape(text).encode('ascii', 'xmlcharrefreplace')
+    return text
+
 
 class HighchartRender(object):
 
@@ -48,7 +63,7 @@ class HighchartRender(object):
                         serie_values.append(value)
 
                 value = serie_operation(serie_values)
-
+                grouper = unicodeToHTMLEntities(grouper)
                 serie_data.append([grouper, round(value, 2)])
             data = self.model.serie_obj.create(**{
                 'name': grouper,
@@ -110,4 +125,5 @@ class HighchartRender(object):
         json = json.replace('[{', '[\n\t{')
         json = json.replace('}]', '}\n]')
         json = json.replace("u'", "'")
+        json = HTMLEntitiesToUnicode(json)
         return json
