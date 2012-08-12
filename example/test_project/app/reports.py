@@ -82,7 +82,7 @@ class BrowserDownloadReport(ReportAdmin):
         'download_date': count_column,
     }
     list_serie_fields = ('browser__name', 'os__name')
-    chart_types = ('pie',)
+    chart_types = ('pie', 'column')
 
 
 reports.register('browser-download-report', BrowserDownloadReport)

@@ -75,7 +75,7 @@ def get_highchart_data():
     xAxisData = {
         'allowDecimals': true,
         'alternateGridColor': null,
-        'categories': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        'categories': [],
         'dateTimeLabelFormats': null,
         'endOnTick': false,
         'events': {},
@@ -117,7 +117,7 @@ def get_highchart_data():
         'tickPixelInterval': null,
         'tickPosition': "outside",
         'tickWidth': 1,
-        'title': {},
+        'title': DictObject(**TitleData),
         'type': "linear"
     }
 
@@ -171,9 +171,7 @@ def get_highchart_data():
         'tickmarkPlacement': "between",
         'tickPixelInterval': null,
         'tickPosition': "outside",
-        'title': {
-            'text': 'Subtitle'
-        },
+        'title': DictObject(**TitleData),
         'type': "linear"
     }
 
@@ -274,11 +272,49 @@ def get_highchart_data():
         'zIndex': null
     }
 
+    plotOptionsDataCOLUMN = {
+        'borderColor': '#FFFFFF',
+        'borderRadius': 0,
+        'borderWidth': 1,
+        'colorByPoint': false,
+        'cropThreshold': 50,
+        'groupPadding': 0.2,
+        'minPointLength': 0,
+        'pointPadding': 0.1,
+        'pointWidth': null,
+        'allowPointSelect': false,
+        'animation': true,
+        # 'color': ,
+        'connectNulls': false,
+        'cursor': '',
+        'dashStyle': null,
+        'dataLabels': {},
+        'enableMouseTracking': true,
+        'events': {},
+        'id': null,
+        'lineWidth': 2,
+        'marker': {},
+        'point': {},
+        'pointStart': 0,
+        'pointInterval': 1,
+        'selected': false,
+        'shadow': true,
+        'showCheckbox': false,
+        'showInLegend': true,
+        'stacking': null,
+        'states': {},
+        'stickyTracking': true,
+        'tooltip': {},
+        'turboThreshold': 1000,
+        'visible': true,
+        'zIndex': null
+    }
+
     plotOptionsData = {
         'area': {},
         'areaspline': {},
         'bar': {},
-        'column': {},
+        'column': DictObject(**plotOptionsDataCOLUMN),
         'line': {},
         'pie': DictObject(**plotOptionsDataPIE),
         'series': [{}],

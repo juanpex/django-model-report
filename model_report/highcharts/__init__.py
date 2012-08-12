@@ -93,7 +93,56 @@ class HighchartRender(object):
         self.model.plotOptions.pie.dataLabels.formatter = "function() { return '<b>'+ this.point.name +'</b>: %s '+ %s(this.point.y); }" % (repr_char, repr_fun)
 
     def set_bar_chart_options(self, report_rows):
-        pass
+        funcs_op = {
+            'sum': sum,
+            'max': max,
+            'min': min,
+            'len': len,
+            'avg': lambda vlist: sum(vlist) / len(vlist)
+        }
+        serie_operation = funcs_op[self.config['serie_op']]
+
+        if self.config['has_group_totals']:
+            serie_data = []
+            xAxis_categories = []
+            yAxis_min = 0
+            for grouper, rows in report_rows:
+                add_group = True
+                if self.config['has_report_totals']:
+                    if len(rows) <= 2:
+                        add_group = False
+                if not add_group:
+                    continue
+                serie_values = []
+                for r in rows:
+                    if r.is_value():
+                        value = r[self.config['serie_field']].value
+                        if not is_numeric(value):
+                            value = 1  # TOOD: Map serie_field with posible serie_operator
+                        serie_values.append(value)
+
+                value = serie_operation(serie_values)
+                grouper = unicodeToHTMLEntities(grouper)
+                serie_data.append(round(value, 2))
+                xAxis_categories.append(grouper)
+                yAxis_min = yAxis_min if value > yAxis_min else value
+            data = self.model.serie_obj.create(**{
+                'name': grouper,
+                'data': serie_data,
+            })
+            self.model.series.add(data)
+
+        self.model.chart.renderTo = 'container'
+        self.model.chart.type = 'column'
+        self.model.title.text = self.config['title']
+        self.model.xAxis.categories = xAxis_categories
+        self.model.xAxis.min = yAxis_min
+        self.model.yAxis.title.text = ' '
+        self.model.tooltip.formatter = "function() { return ''+ this.x +': '+ this.y; }"
+        self.model.plotOptions.column.pointPadding = 0.2
+        self.model.plotOptions.column.borderWidth = 0.0
+        self.model.plotOptions.column.colorByPoint = true
+        self.model.legend.enabled = false
 
     def is_valid(self):
         if self.config:

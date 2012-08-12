@@ -25,7 +25,7 @@ def long_description():
 
 setup(name='django-model-report',
       version=version,
-      author='Juan Pablo Martínez',
+      author='juanpex',
       author_email='jpma55@gmail.com',
       description='Django reports integrated with highcharts.',
       license='BSD',
