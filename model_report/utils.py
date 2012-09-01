@@ -51,13 +51,13 @@ class ReportValue(object):
         return value
 
     def text(self):
-        return self.format(self.value)
+        return force_unicode(self.format(self.value))
 
     def __repr__(self):
-        return force_unicode("%s" % self.text())
+        return self.text()
 
     def __unicode__(self):
-        return force_unicode("%s" % self.text())
+        return self.text()
 
     def __str__(self):
         return "%s" % self.text()
