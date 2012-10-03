@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n model_report %}
 <table class="report">
     <thead>
         <tr>
@@ -17,7 +17,7 @@
                     <span class="result-collapsable expanded" row="row-{{ gruper|default_if_none:_('Results')|slugify }}">-</span>
                     {% endif %}
                     {{ gruper|default_if_none:_('Results') }}
-                    {% if report_anchors %}<a style="float: right; color: grey; font-weight: normal; font-size: 12px;" href="#data_container">{% trans "Go up" %}</a>{% endif %}
+                    {% if report_anchors and not report.parent_report %}<a style="float: right; color: grey; font-weight: normal; font-size: 12px;" href="#data_container">{% trans "Go up" %}</a>{% endif %}
                 </td>
             </tr>
             {% endif %}
@@ -30,6 +30,15 @@
                 </td>
                 {% endfor %}
             </tr>
+            {% if report_inlines %}
+                {% for inline in report_inlines %}
+                    <tr>
+                        <td colspan="{{ column_labels|length }}">
+                            {% model_report_render_inline inline row %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
             {% endfor %}
 
         {% empty %}

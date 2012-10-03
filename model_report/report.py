@@ -14,13 +14,18 @@ from model_report.highcharts import HighchartRender
 from model_report.widgets import RangeField
 from model_report.export_pdf import render_to_pdf
 
+try:
+    from collections import OrderedDict
+except:
+    OrderedDict = dict
+
 
 class ReportInstanceManager(object):
 
-    _register = {}
+    _register = OrderedDict()
 
     def __init__(self):
-        self._register = {}
+        self._register = OrderedDict()
 
     def register(self, slug, rclass):
         if slug in self._register:
@@ -71,8 +76,10 @@ class ReportAdmin(object):
     list_serie_fields = ()
     chart_types = ()
     exports = ('excel', 'pdf')
+    inlines = []
 
-    def __init__(self):
+    def __init__(self, parent_report=None):
+        self.parent_report = parent_report
         model_fields = []
         for field in self.get_query_field_names():
             try:
@@ -152,10 +159,12 @@ class ReportAdmin(object):
     def reorder_dictrow(self, dictrow):
         return [dictrow[field_name] for field_name in self.fields]
 
-    @cache_return
-    def get_column_names(self):
+    #@cache_return
+    def get_column_names(self, ignore_columns={}):
         values = []
         for field, field_name in self.model_fields:
+            if field_name in ignore_columns:
+                continue
             caption = self.override_field_labels.get(field_name, base_label)(self, field)
             values.append(caption)
         return values
@@ -187,13 +196,26 @@ class ReportAdmin(object):
                 title = force_unicode(self.model._meta.verbose_name_plural).lower().capitalize()
         return title
 
-    def render(self, request, extra_context={}):
+    def get_render_context(self, request, extra_context={}, by_row=None):
+        related_fields = []
+        filter_related_fields = {}
+        if self.parent_report and by_row:
+            for index, (pfield, plookup) in enumerate(self.parent_report.model_fields):
+                for cfield, clookup in self.model_fields:
+                    if pfield is cfield and plookup in clookup:
+                        related_fields.append([pfield, cfield, plookup, clookup, by_row[index]])
+                        filter_related_fields[clookup] = by_row[index]
+            # previews_get = dict(request.GET)
+            # request.GET._mutable = True
+            # request.GET.update(previews_get)
+            # request.GET.update(filter_related_fields)
+
         try:
             form_groupby = self.get_form_groupby(request)
             form_filter = self.get_form_filter(request)
             form_config = self.get_form_config(request)
 
-            column_labels = self.get_column_names()
+            column_labels = self.get_column_names(filter_related_fields)
             report_rows = []
             groupby_data = None
             filter_kwargs = None
@@ -213,12 +235,12 @@ class ReportAdmin(object):
 
             if request.GET:
                 groupby_data = form_groupby.get_cleaned_data() if form_groupby else None
-                filter_kwargs = form_filter.get_filter_kwargs()
+                filter_kwargs = filter_related_fields or form_filter.get_filter_kwargs()
                 if groupby_data:
                     self.__dict__.update(groupby_data)
                 else:
                     self.__dict__['onlytotals'] = False
-                report_rows = self.get_rows(request, groupby_data, filter_kwargs)
+                report_rows = self.get_rows(request, groupby_data, filter_kwargs, filter_related_fields)
 
                 for g, r in report_rows:
                     report_anchors.append(g)
@@ -271,6 +293,8 @@ class ReportAdmin(object):
                         context.update({'pagesize': 'legal landscape'})
                         return render_to_pdf(self, 'model_report/export_pdf.html', context)
 
+            inlines = [ir(self) for ir in self.inlines]
+
             context = {
                 'report': self,
                 'form_groupby': form_groupby,
@@ -280,14 +304,20 @@ class ReportAdmin(object):
                 'report_anchors': report_anchors,
                 'column_labels': column_labels,
                 'report_rows': report_rows,
+                'report_inlines': inlines,
+                'request': request,
             }
 
             if extra_context:
                 context.update(extra_context)
 
-            return render_to_response('model_report/report.html', context, context_instance=RequestContext(request))
+            return context
         finally:
             globals()['_cache_class'] = {}
+
+    def render(self, request, extra_context={}):
+        context = self.get_render_context(request, extra_context)
+        return render_to_response('model_report/report.html', context, context_instance=RequestContext(request))
 
     def has_report_totals(self):
         return not (not self.report_totals)
@@ -506,7 +536,7 @@ class ReportAdmin(object):
 
         return form
 
-    def get_rows(self, request, groupby_data=None, filter_kwargs={}):
+    def get_rows(self, request, groupby_data=None, filter_kwargs={}, filter_related_fields={}):
 
         report_rows = []
 
@@ -530,7 +560,7 @@ class ReportAdmin(object):
 
         from itertools import groupby
         qs = self.get_query_set(filter_kwargs)
-        ffields = [f if 'self.' not in f else 'pk' for f in self.get_query_field_names()]
+        ffields = [f if 'self.' not in f else 'pk' for f in self.get_query_field_names() if f not in filter_related_fields]
         obfields = list(self.list_order_by)
         if groupby_data and groupby_data['groupby']:
             if groupby_data['groupby'] in obfields:

@@ -89,10 +89,12 @@ reports.register('browser-download-report', BrowserDownloadReport)
 
 
 class BrowserReport(ReportAdmin):
+    title = _('Browser with Inline Downloads')
     model = Browser
     fields = [
         'name',
     ]
+    inlines = [BrowserDownloadReport]
     # list_filter = ('name',)
     list_order_by = ('name',)
     # list_group_by = ('browser__name', 'os__name',)
