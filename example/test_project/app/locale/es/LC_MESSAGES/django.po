@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: app\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-07-29 23:14-0300\n"
-"PO-Revision-Date: 2012-07-29 23:14-0300\n"
+"POT-Creation-Date: 2012-10-03 00:56-0300\n"
+"PO-Revision-Date: 2012-10-03 00:57-0300\n"
 "Last-Translator: Juan Pablo Martínez <jpma55@gmail.com>\n"
 "Language-Team: juanpex <jpma55@gmail.com>\n"
 "Language: \n"
@@ -18,60 +18,60 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "X-Poedit-Language: Spanish\n"
 
-#: models.py:10
+#: models.py:11
 msgid "Age"
 msgstr "Edad"
 
-#: models.py:11
+#: models.py:12
 msgid "Men"
 msgstr "Hombres"
 
-#: models.py:12
+#: models.py:13
 msgid "Women"
 msgstr "Mujeres"
 
-#: models.py:18
+#: models.py:19
 msgid "Population"
 msgstr "Población"
 
-#: models.py:19
+#: models.py:20
 msgid "Populations"
 msgstr "Poblaciones"
 
-#: models.py:26
-#: models.py:37
+#: models.py:27
+#: models.py:38
 msgid "Name"
 msgstr "Nombre"
 
-#: models.py:29
+#: models.py:30
 msgid "Browser"
 msgstr "Navegador"
 
-#: models.py:30
+#: models.py:31
 msgid "Browsers"
 msgstr "Navegadores"
 
-#: models.py:40
+#: models.py:41
 msgid "OS"
 msgstr "SO:"
 
-#: models.py:41
+#: models.py:42
 msgid "OS's"
 msgstr "SO's"
 
-#: models.py:48
+#: models.py:49
 msgid "Download date"
 msgstr "Fecha de descarga"
 
-#: models.py:51
+#: models.py:52
 msgid "Username"
 msgstr "Nombre de usuario"
 
-#: models.py:54
+#: models.py:55
 msgid "Browser Download"
 msgstr "Descarga de Navegador"
 
-#: models.py:55
+#: models.py:56
 msgid "Browser Downloads"
 msgstr "Descargas de Navegadores"
 
@@ -96,6 +96,10 @@ msgstr "[Navegador] Nombre"
 #: reports.py:59
 msgid "[OS] Name"
 msgstr "[SO] Nombre"
+
+#: reports.py:92
+msgid "Browser with Inline Downloads"
+msgstr "Navegadores seguidos por Descargas"
 
 #~ msgid "Men's"
 #~ msgstr "Hombres"

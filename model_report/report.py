@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 import copy
+import csv
+from itertools import groupby
+
+from django.http import HttpResponse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.utils.translation import ugettext_lazy as _
@@ -159,7 +163,6 @@ class ReportAdmin(object):
     def reorder_dictrow(self, dictrow):
         return [dictrow[field_name] for field_name in self.fields]
 
-    #@cache_return
     def get_column_names(self, ignore_columns={}):
         values = []
         for field, field_name in self.model_fields:
@@ -205,10 +208,6 @@ class ReportAdmin(object):
                     if pfield is cfield and plookup in clookup:
                         related_fields.append([pfield, cfield, plookup, clookup, by_row[index]])
                         filter_related_fields[clookup] = by_row[index]
-            # previews_get = dict(request.GET)
-            # request.GET._mutable = True
-            # request.GET.update(previews_get)
-            # request.GET.update(filter_related_fields)
 
         try:
             form_groupby = self.get_form_groupby(request)
@@ -261,9 +260,6 @@ class ReportAdmin(object):
 
                 if not request.GET.get('export', None) is None:
                     if request.GET.get('export') == 'excel':
-                        import csv
-                        from django.http import HttpResponse
-
                         response = HttpResponse(mimetype='text/csv')
                         response['Content-Disposition'] = 'attachment; filename=%s.csv' % self.slug
 
@@ -316,8 +312,11 @@ class ReportAdmin(object):
             globals()['_cache_class'] = {}
 
     def render(self, request, extra_context={}):
-        context = self.get_render_context(request, extra_context)
-        return render_to_response('model_report/report.html', context, context_instance=RequestContext(request))
+        context_or_response = self.get_render_context(request, extra_context)
+
+        if isinstance(context_or_response, HttpResponse):
+            return context_or_response
+        return render_to_response('model_report/report.html', context_or_response, context_instance=RequestContext(request))
 
     def has_report_totals(self):
         return not (not self.report_totals)
@@ -558,7 +557,6 @@ class ReportAdmin(object):
                 attr = attr()
             return attr
 
-        from itertools import groupby
         qs = self.get_query_set(filter_kwargs)
         ffields = [f if 'self.' not in f else 'pk' for f in self.get_query_field_names() if f not in filter_related_fields]
         obfields = list(self.list_order_by)
