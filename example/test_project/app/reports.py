@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.utils.translation import ugettext_lazy as _
-from app.models import Population, BrowserDownload
+from app.models import Population, Browser, BrowserDownload
 
 from model_report.report import reports, ReportAdmin
 from model_report.utils import (avg_column, sum_column, count_column)
@@ -86,3 +86,31 @@ class BrowserDownloadReport(ReportAdmin):
 
 
 reports.register('browser-download-report', BrowserDownloadReport)
+
+
+class BrowserReport(ReportAdmin):
+    title = _('Browser with Inline Downloads')
+    model = Browser
+    fields = [
+        'name',
+    ]
+    inlines = [BrowserDownloadReport]
+    # list_filter = ('name',)
+    list_order_by = ('name',)
+    # list_group_by = ('browser__name', 'os__name',)
+    type = 'report'
+    # override_field_labels = {
+    #     'browser__name': browser__name_label,
+    #     'os__name': os__name_label,
+    # }
+    # group_totals = {
+    #     'download_date': count_column,
+    # }
+    # report_totals = {
+    #     'download_date': count_column,
+    # }
+    #list_serie_fields = ('browser__name', 'os__name')
+    # chart_types = ('pie', 'column')
+
+
+reports.register('browser-report', BrowserReport)
