@@ -214,7 +214,10 @@ class ReportAdmin(object):
             if request.GET:
                 groupby_data = form_groupby.get_cleaned_data() if form_groupby else None
                 filter_kwargs = form_filter.get_filter_kwargs()
-                self.__dict__.update(groupby_data)
+                if groupby_data:
+                    self.__dict__.update(groupby_data)
+                else:
+                    self.__dict__['onlytotals'] = False
                 report_rows = self.get_rows(request, groupby_data, filter_kwargs)
 
                 for g, r in report_rows:
@@ -286,10 +289,16 @@ class ReportAdmin(object):
         finally:
             globals()['_cache_class'] = {}
 
+    def has_report_totals(self):
+        return not (not self.report_totals)
+
+    def has_group_totals(self):
+        return not (not self.group_totals)
+
     def get_chart(self, config, report_rows):
         config['title'] = self.get_title()
-        config['has_report_totals'] = not (not self.report_totals)
-        config['has_group_totals'] = not (not self.group_totals)
+        config['has_report_totals'] = self.has_report_totals()
+        config['has_group_totals'] = self.has_group_totals()
         return HighchartRender(config).get_chart(report_rows)
 
     @cache_return
@@ -396,35 +405,40 @@ class ReportAdmin(object):
 
     def get_form_filter(self, request):
         form_fields = fields_for_model(self.model, [f for f in self.get_query_field_names() if f in self.list_filter])
-        opts = self.model._meta
-        for k, v in dict(form_fields).items():
-            if v is None:
-                field_name = k.split("__")[0]
-                model_field = opts.get_field_by_name(field_name)[0]
-                if isinstance(model_field, (DateField, DateTimeField)):
-                    form_fields.pop(k)
-                    form_fields[k] = RangeField(model_field.formfield)
-                else:
-                    field = model_field.formfield()
-                    field.label = force_unicode(_(field.label))
-                    form_fields[k] = field
-            else:
-                if isinstance(v, (forms.BooleanField)):
-                    form_fields.pop(k)
-                    form_fields[k] = forms.ChoiceField()
-                    form_fields[k].label = v.label
-                    form_fields[k].help_text = v.help_text
-                    form_fields[k].choices = (
-                        ('', ''),
-                        (True, _('Yes')),
-                        (False, _('No')),
-                    )
-                    setattr(form_fields[k], 'as_boolean', True)
-                elif isinstance(v, (forms.DateField, forms.DateTimeField)):
+        if not form_fields:
+            form_fields = {
+                '__all__': forms.BooleanField(label='', widget=forms.HiddenInput, initial='1')
+            }
+        else:
+            opts = self.model._meta
+            for k, v in dict(form_fields).items():
+                if v is None:
                     field_name = k.split("__")[0]
                     model_field = opts.get_field_by_name(field_name)[0]
-                    form_fields.pop(k)
-                    form_fields[k] = RangeField(model_field.formfield)
+                    if isinstance(model_field, (DateField, DateTimeField)):
+                        form_fields.pop(k)
+                        form_fields[k] = RangeField(model_field.formfield)
+                    else:
+                        field = model_field.formfield()
+                        field.label = force_unicode(_(field.label))
+                        form_fields[k] = field
+                else:
+                    if isinstance(v, (forms.BooleanField)):
+                        form_fields.pop(k)
+                        form_fields[k] = forms.ChoiceField()
+                        form_fields[k].label = v.label
+                        form_fields[k].help_text = v.help_text
+                        form_fields[k].choices = (
+                            ('', ''),
+                            (True, _('Yes')),
+                            (False, _('No')),
+                        )
+                        setattr(form_fields[k], 'as_boolean', True)
+                    elif isinstance(v, (forms.DateField, forms.DateTimeField)):
+                        field_name = k.split("__")[0]
+                        model_field = opts.get_field_by_name(field_name)[0]
+                        form_fields.pop(k)
+                        form_fields[k] = RangeField(model_field.formfield)
 
         form_class = type('FilterFormBase', (forms.BaseForm,), {'base_fields': form_fields})
 
@@ -438,6 +452,9 @@ class ReportAdmin(object):
                     return {}
                 filter_kwargs = dict(self.cleaned_data)
                 for k, v in dict(filter_kwargs).items():
+                    if k == '__all__':
+                        filter_kwargs.pop(k)
+                        continue
                     if isinstance(v, (list, tuple)):
                         if isinstance(self.fields[k], (RangeField)):
                             filter_kwargs.pop(k)
@@ -457,6 +474,7 @@ class ReportAdmin(object):
 
             def __init__(self, *args, **kwargs):
                 super(FilterForm, self).__init__(*args, **kwargs)
+                self.filter_report_is_all = '__all__' in self.fields and len(self.fields) == 1
                 try:
                     data_filters = {}
                     vals = args[0]
@@ -514,7 +532,7 @@ class ReportAdmin(object):
         qs = self.get_query_set(filter_kwargs)
         ffields = [f if 'self.' not in f else 'pk' for f in self.get_query_field_names()]
         obfields = list(self.list_order_by)
-        if groupby_data['groupby']:
+        if groupby_data and groupby_data['groupby']:
             if groupby_data['groupby'] in obfields:
                 obfields.remove(groupby_data['groupby'])
             obfields.insert(0, groupby_data['groupby'])
@@ -590,7 +608,7 @@ class ReportAdmin(object):
             return row
 
         qs_list = get_with_dotvalues(qs_list)
-        if groupby_data['groupby']:
+        if groupby_data and groupby_data['groupby']:
             g = groupby(qs_list, lambda x: x[ffields.index(groupby_data['groupby'])])
         else:
             g = groupby(qs_list, lambda x: None)
@@ -634,12 +652,16 @@ class ReportAdmin(object):
                     rows.append(row)
                 for k, v in row_group_totals.items():
                     row_report_totals[k].extend(v)
-            grouper = self._get_grouper_text(groupby_data['groupby'], grouper)
+            if groupby_data and groupby_data['groupby']:
+                grouper = self._get_grouper_text(groupby_data['groupby'], grouper)
+            else:
+                grouper = None
             report_rows.append([grouper, rows])
-        header_report_total = compute_row_header(self.group_totals)
-        row = compute_row_totals(self.report_totals, row_report_totals)
-        header_report_total.is_report_totals = True
-        row.is_report_totals = True
-        report_rows.append([_('Totals'), [header_report_total, row]])
+        if self.has_report_totals():
+            header_report_total = compute_row_header(self.group_totals)
+            row = compute_row_totals(self.report_totals, row_report_totals)
+            header_report_total.is_report_totals = True
+            row.is_report_totals = True
+            report_rows.append([_('Totals'), [header_report_total, row]])
 
         return report_rows
