@@ -21,7 +21,39 @@ from model_report.export_pdf import render_to_pdf
 try:
     from collections import OrderedDict
 except:
-    OrderedDict = dict
+    OrderedDict = dict  # pyflakes:ignore
+
+
+def autodiscover():
+    """
+    Auto-discover INSTALLED_APPS report.py modules and fail silently when
+    not present. Borrowed form django.contrib.admin
+    """
+
+    from django.conf import settings
+    from django.utils.importlib import import_module
+    from django.utils.module_loading import module_has_submodule
+
+    global reports
+
+    for app in settings.INSTALLED_APPS:
+        mod = import_module(app)
+        # Attempt to import the app's admin module.
+        try:
+            before_import_registry = copy.copy(reports)
+            import_module('%s.reports' % app)
+        except:
+            # Reset the model registry to the state before the last import as
+            # this import will have to reoccur on the next request and this
+            # could raise NotRegistered and AlreadyRegistered exceptions
+            # (see #8245).
+            reports = before_import_registry
+
+            # Decide whether to bubble up this error. If the app just
+            # doesn't have an admin module, we can ignore the error
+            # attempting to import it, otherwise we want it to bubble up.
+            if module_has_submodule(mod, 'reports'):
+                raise
 
 
 class ReportInstanceManager(object):
