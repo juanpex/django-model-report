@@ -3,3 +3,4 @@ pisa
 reportlab
 html5lib
 BeautifulSoup
+dj_database_url
