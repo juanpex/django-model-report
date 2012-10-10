@@ -1,1 +1,1 @@
-web:python ./example/manage.py runserver
+web: python ./example/manage.py runserver
