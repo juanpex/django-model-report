@@ -1,1 +1,1 @@
-web: python ./example/manage.py runserver 36486
+web: python ./example/manage.py runserver 0.0.0.0:$PORT
