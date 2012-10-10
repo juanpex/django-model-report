@@ -166,4 +166,4 @@ try:
     import dj_database_url
     DATABASES = {'default': dj_database_url.config(default='postgres://localhost')}
 except Exception:
-    print 'Unexpected error:', sys.exc_info()
+    pass

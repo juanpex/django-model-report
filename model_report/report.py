@@ -114,8 +114,9 @@ class ReportAdmin(object):
     exports = ('excel', 'pdf')
     inlines = []
 
-    def __init__(self, parent_report=None):
+    def __init__(self, parent_report=None, request=None):
         self.parent_report = parent_report
+        self.request = request
         model_fields = []
         for field in self.get_query_field_names():
             try:
@@ -232,6 +233,7 @@ class ReportAdmin(object):
         return title
 
     def get_render_context(self, request, extra_context={}, by_row=None):
+        context_request = request or self.request
         related_fields = []
         filter_related_fields = {}
         if self.parent_report and by_row:
@@ -242,9 +244,9 @@ class ReportAdmin(object):
                         filter_related_fields[clookup] = by_row[index]
 
         try:
-            form_groupby = self.get_form_groupby(request)
-            form_filter = self.get_form_filter(request)
-            form_config = self.get_form_config(request)
+            form_groupby = self.get_form_groupby(context_request)
+            form_filter = self.get_form_filter(context_request)
+            form_config = self.get_form_config(context_request)
 
             column_labels = self.get_column_names(filter_related_fields)
             report_rows = []
@@ -264,14 +266,14 @@ class ReportAdmin(object):
                 'report_rows': report_rows,
             }
 
-            if request.GET:
+            if context_request.GET:
                 groupby_data = form_groupby.get_cleaned_data() if form_groupby else None
                 filter_kwargs = filter_related_fields or form_filter.get_filter_kwargs()
                 if groupby_data:
                     self.__dict__.update(groupby_data)
                 else:
                     self.__dict__['onlytotals'] = False
-                report_rows = self.get_rows(request, groupby_data, filter_kwargs, filter_related_fields)
+                report_rows = self.get_rows(context_request, groupby_data, filter_kwargs, filter_related_fields)
 
                 for g, r in report_rows:
                     report_anchors.append(g)
@@ -290,8 +292,8 @@ class ReportAdmin(object):
                             if r.is_value():
                                 rows.remove(r)
 
-                if not request.GET.get('export', None) is None:
-                    if request.GET.get('export') == 'excel':
+                if not context_request.GET.get('export', None) is None and not self.parent_report:
+                    if context_request.GET.get('export') == 'excel':
                         response = HttpResponse(mimetype='text/csv')
                         response['Content-Disposition'] = 'attachment; filename=%s.csv' % self.slug
 
@@ -310,18 +312,20 @@ class ReportAdmin(object):
                                     writer.writerow([unicode(' ').encode("utf-8") for x in row])
 
                         return response
-                    if request.GET.get('export') == 'pdf':
+                    if context_request.GET.get('export') == 'pdf':
+                        inlines = [ir(self, context_request) for ir in self.inlines]
                         report_anchors = None
                         setattr(self, 'is_export', True)
                         context = {
                             'report': self,
                             'column_labels': column_labels,
                             'report_rows': report_rows,
+                            'report_inlines': inlines,
                         }
                         context.update({'pagesize': 'legal landscape'})
                         return render_to_pdf(self, 'model_report/export_pdf.html', context)
 
-            inlines = [ir(self) for ir in self.inlines]
+            inlines = [ir(self, context_request) for ir in self.inlines]
 
             context = {
                 'report': self,
@@ -333,7 +337,7 @@ class ReportAdmin(object):
                 'column_labels': column_labels,
                 'report_rows': report_rows,
                 'report_inlines': inlines,
-                'request': request,
+                'request': context_request,
             }
 
             if extra_context:
