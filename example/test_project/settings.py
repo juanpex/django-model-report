@@ -2,8 +2,6 @@
 from os.path import abspath, dirname, basename, join
 import sys
 
-DEBUG = True
-
 PROJECT_ABSOLUTE_DIR = dirname(abspath(__file__))
 PROJECT_NAME = basename(PROJECT_ABSOLUTE_DIR)
 
