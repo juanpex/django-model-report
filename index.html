@@ -1,0 +1,235 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Django-model-report by juanpex</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/main.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+
+      <header>
+        <h1>Django-model-report</h1>
+        <p>django reports integrated with highcharts</p>
+      </header>
+
+      <div id="banner">
+        <span id="logo"></span>
+
+        <a href="https://github.com/juanpex/django-model-report" class="button fork"><strong>View On GitHub</strong></a>
+        <div class="downloads">
+          <span>Downloads:</span>
+          <ul>
+            <li><a href="https://github.com/juanpex/django-model-report/zipball/master" class="button">ZIP</a></li>
+            <li><a href="https://github.com/juanpex/django-model-report/tarball/master" class="button">TAR</a></li>
+          </ul>
+        </div>
+      </div><!-- end banner -->
+
+    <div class="wrapper">
+      <nav>
+        <ul></ul>
+      </nav>
+      <section>
+        <h1>Django Model Report</h1>
+
+<p>django reports integrated with highcharts</p>
+
+<h1>Demo</h1>
+
+<p><a href="http://django-model-report.herokuapp.com">http://django-model-report.herokuapp.com</a></p>
+
+<h1>Installation</h1>
+
+<ul>
+<li><p>Add the <code>model_report</code> directory to your Python path.</p></li>
+<li><p>Add <code>model_report</code> to your <code>INSTALLED_APPS</code> setting.</p></li>
+<li><p>Create file "reports.py" within any application directory (just like admin.py).</p></li>
+<li>
+<p>Edit the file "reports.py" and register your reports like this:</p>
+
+<pre><code>from app.models import Browser
+from model_report.report import reports, ReportAdmin
+
+class BrowserReport(ReportAdmin):
+    title = _('Browser with Inline Downloads')
+    model = Browser
+    fields = [
+        'name',
+    ]
+    list_order_by = ('name',)
+    type = 'report'
+
+reports.register('browser-report', BrowserReport)
+</code></pre>
+</li>
+<li>
+<p>Activate your reports calling the autodiscover in <code>urls.py</code> (just like admin.py).</p>
+
+<pre><code>from model_report import report
+report.autodiscover()
+</code></pre>
+</li>
+<li>
+<p>Add reports urls</p>
+
+<p>urlpatterns = patterns('',
+    ...
+    (r'', include('model_report.urls')),
+    ...
+)</p>
+</li>
+</ul><h1>Configuration</h1>
+
+<p>Extend your reports <code>from model_report.report import ReportAdmin</code></p>
+
+<pre><code>class ReportExample(ReportAdmin):
+    pass
+</code></pre>
+
+<ul>
+<li>
+<p>Atributes</p>
+
+<p><code>title</code>:</p>
+
+<p>Title of the report.</p>
+
+<p><code>template_name</code>:</p>
+
+<p>Template file name to render the report.</p>
+
+<p><code>exports</code>:</p>
+
+<p>List of allowed export formats.</p>
+
+<p>Example:</p>
+
+<pre><code>exports = ('excel', 'pdf')
+</code></pre>
+
+<p><code>model</code>:</p>
+
+<p>Django model</p>
+
+<p><code>fields</code>:</p>
+
+<p>List of model fields to be listed.</p>
+
+<p><code>list_filter</code>:</p>
+
+<p>List of fields to filter data.</p>
+
+<p><code>list_order_by</code>:</p>
+
+<p>List of fields to order data.</p>
+
+<p><code>list_group_by</code>:</p>
+
+<p>List of fields to group data.</p>
+
+<p><code>type</code>:</p>
+
+<p>"report" for only report.</p>
+
+<p>"chart" for report and show chart graphic results.</p>
+
+<p><code>group_totals</code>:</p>
+
+<p>Dictionary with field name as key and function to calculate their values.
+This row is displayed after each group as their totals.</p>
+
+<p>Example:</p>
+
+<pre><code>group_totals = {
+    'men': sum_column,
+    'women': sum_column
+}
+</code></pre>
+
+<p><code>report_totals</code>:</p>
+
+<p>Dictionary with field name as key and function to calculate their values.
+This row is displayed at the end of the report as the totals of all results.</p>
+
+<p>Example:</p>
+
+<pre><code>report_totals = {
+    'men': avg_column,
+    'women': avg_column
+}
+</code></pre>
+
+<p><code>override_field_values</code>:</p>
+
+<p>Dictionary with field name as key and function to parse their original values.</p>
+
+<p>Example:</p>
+
+<pre><code>override_field_values = {
+    'men': men_format,
+    'women': women_format
+}
+</code></pre>
+
+<p><code>override_field_formats</code>:</p>
+
+<p>Dictionary with field name as key and function to parse their value after <code>override_field_values</code>.</p>
+
+<p>Example:</p>
+
+<pre><code>override_field_formats = {
+    'men': men_format,
+    'women': women_format
+}
+</code></pre>
+
+<p><code>override_field_labels</code>:</p>
+
+<p>Dictionary with field name as key and function to parse the column label.</p>
+
+<p>Example:</p>
+
+<pre><code>override_field_labels = {
+    'men': men_label
+}
+</code></pre>
+
+<p><code>list_serie_fields</code>:</p>
+
+<p>List of fields to group by results in chart.</p>
+
+<p><code>chart_types</code>:</p>
+
+<p>List of highchart types.</p>
+
+<p>Example:</p>
+
+<pre><code>chart_types = ('pie', 'column')
+</code></pre>
+
+<p><code>inlines</code>:</p>
+
+<p>List of other's Report related to the main report.</p>
+</li>
+</ul><h1>Contribute</h1>
+
+<p>Clone the repo and help to be better this app :)</p>
+      </section>
+      <footer>
+        <p>Project maintained by <a href="https://github.com/juanpex">juanpex</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
