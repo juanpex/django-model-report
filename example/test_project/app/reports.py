@@ -45,7 +45,6 @@ class PopulationReport(ReportAdmin):
     override_field_labels = {
         'men': men_label,
     }
-    list_serie_fields = ('men', 'women',)
 
 
 reports.register('population-report', PopulationReport)
@@ -81,7 +80,6 @@ class BrowserDownloadReport(ReportAdmin):
     report_totals = {
         'download_date': count_column,
     }
-    list_serie_fields = ('browser__name', 'os__name')
     chart_types = ('pie', 'column')
 
 
@@ -95,22 +93,8 @@ class BrowserReport(ReportAdmin):
         'name',
     ]
     inlines = [BrowserDownloadReport]
-    # list_filter = ('name',)
     list_order_by = ('name',)
-    # list_group_by = ('browser__name', 'os__name',)
     type = 'report'
-    # override_field_labels = {
-    #     'browser__name': browser__name_label,
-    #     'os__name': os__name_label,
-    # }
-    # group_totals = {
-    #     'download_date': count_column,
-    # }
-    # report_totals = {
-    #     'download_date': count_column,
-    # }
-    #list_serie_fields = ('browser__name', 'os__name')
-    # chart_types = ('pie', 'column')
 
 
 reports.register('browser-report', BrowserReport)

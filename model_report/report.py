@@ -109,7 +109,6 @@ class ReportAdmin(object):
     override_field_values = {}
     override_field_formats = {}
     override_field_labels = {}
-    list_serie_fields = ()
     chart_types = ()
     exports = ('excel', 'pdf')
     inlines = []
@@ -281,8 +280,9 @@ class ReportAdmin(object):
                 if len(report_anchors) <= 1:
                     report_anchors = []
 
-                if self.type == 'chart':
+                if self.type == 'chart' and groupby_data and groupby_data['groupby']:
                     config = form_config.get_config_data()
+                    config['serie_field'] = self.fields.index(groupby_data['groupby'])
                     if config:
                         chart = self.get_chart(config, report_rows)
 
@@ -366,10 +366,6 @@ class ReportAdmin(object):
         config['has_group_totals'] = self.has_group_totals()
         return HighchartRender(config).get_chart(report_rows)
 
-    @cache_return
-    def get_serie_fields(self):
-        return [(index, mfield, field, caption) for index, ((mfield, field), caption) in enumerate(zip(self.model_fields, self.get_column_names())) if field in self.list_serie_fields]
-
     def get_form_config(self, request):
 
         DEFAULT_CHART_TYPES = (
@@ -390,18 +386,18 @@ class ReportAdmin(object):
         class ConfigForm(forms.Form):
 
             chart_mode = forms.ChoiceField(label=_('Chart type'), choices=(), required=False)
-            serie_field = forms.ChoiceField(label=_('Serie field'), choices=(), required=False)
+            # serie_field = forms.ChoiceField(label=_('Serie field'), choices=(), required=False)
             serie_op = forms.ChoiceField(label=_('Serie operator'), choices=CHART_SERIE_OPERATOR, required=False)
 
             def __init__(self, *args, **kwargs):
                 super(ConfigForm, self).__init__(*args, **kwargs)
-                choices = [('', '')]
+                # choices = [('', '')]
 
-                for i, (index, mfield, field, caption) in enumerate(self.serie_fields):
-                    choices += (
-                        (index, caption),
-                    )
-                self.fields['serie_field'].choices = list(choices)
+                # for i, (index, mfield, field, caption) in enumerate(self.serie_fields):
+                #     choices += (
+                #         (index, caption),
+                #     )
+                # self.fields['serie_field'].choices = list(choices)
 
                 choices = [('', '')]
                 for k, v in DEFAULT_CHART_TYPES:
@@ -413,12 +409,11 @@ class ReportAdmin(object):
                 data = getattr(self, 'cleaned_data', {})
                 if not data:
                     return {}
-                if not data['serie_field'] or not data['chart_mode'] or not data['serie_op']:
+                if not data['chart_mode'] or not data['serie_op']:
                     return {}
-                data['serie_field'] = int(data['serie_field'])
+                # data['serie_field'] = int(data['serie_field'])
                 return data
 
-        ConfigForm.serie_fields = self.get_serie_fields()
         ConfigForm.chart_types = self.chart_types
         form = ConfigForm(data=request.GET or None)
         form.is_valid()
