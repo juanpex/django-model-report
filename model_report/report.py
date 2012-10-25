@@ -282,8 +282,8 @@ class ReportAdmin(object):
 
                 if self.type == 'chart' and groupby_data and groupby_data['groupby']:
                     config = form_config.get_config_data()
-                    config['serie_field'] = self.fields.index(groupby_data['groupby'])
                     if config:
+                        config['serie_field'] = self.fields.index(groupby_data['groupby'])
                         chart = self.get_chart(config, report_rows)
 
                 if self.onlytotals:
@@ -386,19 +386,10 @@ class ReportAdmin(object):
         class ConfigForm(forms.Form):
 
             chart_mode = forms.ChoiceField(label=_('Chart type'), choices=(), required=False)
-            # serie_field = forms.ChoiceField(label=_('Serie field'), choices=(), required=False)
             serie_op = forms.ChoiceField(label=_('Serie operator'), choices=CHART_SERIE_OPERATOR, required=False)
 
             def __init__(self, *args, **kwargs):
                 super(ConfigForm, self).__init__(*args, **kwargs)
-                # choices = [('', '')]
-
-                # for i, (index, mfield, field, caption) in enumerate(self.serie_fields):
-                #     choices += (
-                #         (index, caption),
-                #     )
-                # self.fields['serie_field'].choices = list(choices)
-
                 choices = [('', '')]
                 for k, v in DEFAULT_CHART_TYPES:
                     if k in self.chart_types:
@@ -411,7 +402,6 @@ class ReportAdmin(object):
                     return {}
                 if not data['chart_mode'] or not data['serie_op']:
                     return {}
-                # data['serie_field'] = int(data['serie_field'])
                 return data
 
         ConfigForm.chart_types = self.chart_types
