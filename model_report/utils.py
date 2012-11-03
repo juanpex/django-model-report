@@ -41,6 +41,10 @@ def yesno_format(value):
     return _('Yes') if value else _('No')
 
 
+def round_format(value):
+    return Decimal('%.2f' % Decimal(value))
+
+
 class ReportValue(object):
     value = None
 

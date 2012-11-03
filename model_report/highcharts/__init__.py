@@ -55,9 +55,9 @@ class HighchartRender(object):
                 if not add_group:
                     continue
                 serie_values = []
-                for r in rows:
-                    if r.is_value():
-                        value = r[self.config['serie_field']].value
+                for row in rows:
+                    if row.is_value():
+                        value = row[self.config['serie_field']].value
                         if not is_numeric(value):
                             value = 1  # TOOD: Map serie_field with posible serie_operator
                         serie_values.append(value)
@@ -146,7 +146,7 @@ class HighchartRender(object):
 
     def is_valid(self):
         if self.config:
-            if self.config['serie_field']:
+            if 'serie_field' in self.config and not self.config['serie_field'] is None:
                 return True
         return False
 

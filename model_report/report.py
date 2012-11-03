@@ -101,6 +101,7 @@ class ReportAdmin(object):
     list_filter = ()
     list_order_by = ()
     list_group_by = ()
+    list_serie_fields = ()
     template_name = None
     title = None
     type = 'report'
@@ -117,6 +118,9 @@ class ReportAdmin(object):
         self.parent_report = parent_report
         self.request = request
         model_fields = []
+        if parent_report:
+            self.related_inline_field = [f for f, x in self.model._meta.get_fields_with_model() if f.rel and hasattr(f.rel, 'to') and f.rel.to is self.parent_report.model][0]
+            self.related_inline_accessor = self.related_inline_field.related.get_accessor_name()
         for field in self.get_query_field_names():
             try:
                 if '__' in field:  # IF field has lookup
@@ -236,11 +240,12 @@ class ReportAdmin(object):
         related_fields = []
         filter_related_fields = {}
         if self.parent_report and by_row:
+
             for index, (pfield, plookup) in enumerate(self.parent_report.model_fields):
                 for cfield, clookup in self.model_fields:
                     if pfield is cfield and plookup in clookup:
-                        related_fields.append([pfield, cfield, plookup, clookup, by_row[index]])
-                        filter_related_fields[clookup] = by_row[index]
+                        related_fields.append([pfield, cfield, plookup, clookup, by_row[index].value])
+                        filter_related_fields[clookup] = by_row[index].value
 
         try:
             form_groupby = self.get_form_groupby(context_request)
@@ -283,7 +288,6 @@ class ReportAdmin(object):
                 if self.type == 'chart' and groupby_data and groupby_data['groupby']:
                     config = form_config.get_config_data()
                     if config:
-                        config['serie_field'] = self.fields.index(groupby_data['groupby'])
                         chart = self.get_chart(config, report_rows)
 
                 if self.onlytotals:
@@ -327,7 +331,12 @@ class ReportAdmin(object):
 
             inlines = [ir(self, context_request) for ir in self.inlines]
 
+            is_inline = self.parent_report is None
+            render_report = not (len(report_rows) == 0 and is_inline)
             context = {
+                'render_report': render_report,
+                'is_inline': is_inline,
+                'inline_column_span': 0 if is_inline else len(self.parent_report.get_column_names()),
                 'report': self,
                 'form_groupby': form_groupby,
                 'form_filter': form_filter,
@@ -337,12 +346,12 @@ class ReportAdmin(object):
                 'column_labels': column_labels,
                 'report_rows': report_rows,
                 'report_inlines': inlines,
-                'request': context_request,
             }
 
             if extra_context:
                 context.update(extra_context)
 
+            context['request'] = request
             return context
         finally:
             globals()['_cache_class'] = {}
@@ -386,6 +395,7 @@ class ReportAdmin(object):
         class ConfigForm(forms.Form):
 
             chart_mode = forms.ChoiceField(label=_('Chart type'), choices=(), required=False)
+            serie_field = forms.ChoiceField(label=_('Serie field'), choices=(), required=False)
             serie_op = forms.ChoiceField(label=_('Serie operator'), choices=CHART_SERIE_OPERATOR, required=False)
 
             def __init__(self, *args, **kwargs):
@@ -395,16 +405,25 @@ class ReportAdmin(object):
                     if k in self.chart_types:
                         choices.append([k, v])
                 self.fields['chart_mode'].choices = list(choices)
+                choices = [('', '')]
+                for i, (index, mfield, field, caption) in enumerate(self.serie_fields):
+                    choices += (
+                        (index, caption),
+                    )
+                self.fields['serie_field'].choices = list(choices)
 
             def get_config_data(self):
                 data = getattr(self, 'cleaned_data', {})
                 if not data:
                     return {}
-                if not data['chart_mode'] or not data['serie_op']:
+                if not data['serie_field'] or not data['chart_mode'] or not data['serie_op']:
                     return {}
+                data['serie_field'] = int(data['serie_field'])
                 return data
 
+        ConfigForm.serie_fields = self.get_serie_fields()
         ConfigForm.chart_types = self.chart_types
+        ConfigForm.serie_fields
         form = ConfigForm(data=request.GET or None)
         form.is_valid()
 
@@ -413,6 +432,10 @@ class ReportAdmin(object):
     @cache_return
     def get_groupby_fields(self):
         return [(mfield, field, caption) for (mfield, field), caption in zip(self.model_fields, self.get_column_names()) if field in self.list_group_by]
+
+    @cache_return
+    def get_serie_fields(self):
+        return [(index, mfield, field, caption) for index, ((mfield, field), caption) in enumerate(zip(self.model_fields, self.get_column_names())) if field in self.list_serie_fields]
 
     @cache_return
     def get_form_groupby(self, request):
@@ -556,8 +579,10 @@ class ReportAdmin(object):
 
         return form
 
-    def get_rows(self, request, groupby_data=None, filter_kwargs={}, filter_related_fields={}):
+    def filter_query(self, qs):
+        return qs
 
+    def get_rows(self, request, groupby_data=None, filter_kwargs={}, filter_related_fields={}):
         report_rows = []
 
         def get_field_value(obj, field):
@@ -585,6 +610,7 @@ class ReportAdmin(object):
             if groupby_data['groupby'] in obfields:
                 obfields.remove(groupby_data['groupby'])
             obfields.insert(0, groupby_data['groupby'])
+        qs = self.filter_query(qs)
         qs = qs.order_by(*obfields)
         qs = qs.values_list(*ffields)
         qs_list = list(qs)

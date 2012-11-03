@@ -1,4 +1,5 @@
 {% load i18n model_report %}
+
 <table class="report">
     <thead>
         <tr>
@@ -30,13 +31,9 @@
                 </td>
                 {% endfor %}
             </tr>
-            {% if report_inlines %}
+            {% if report_inlines and row.is_value %}
                 {% for inline in report_inlines %}
-                    <tr>
-                        <td colspan="{{ column_labels|length }}">
-                            {% model_report_render_inline inline row %}
-                        </td>
-                    </tr>
+                    {% model_report_render_inline inline row %}
                 {% endfor %}
             {% endif %}
             {% endfor %}

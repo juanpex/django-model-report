@@ -15,7 +15,11 @@ class ModelReportInlineNode(template.Node):
         inline = self.inline.resolve(context)
         row = self.row.resolve(context)
         request = context.get('request')
-        return render_to_string('model_report/includes/report_inline.html', inline.get_render_context(request, by_row=row))
+        if row.is_value():
+            inline_context = inline.get_render_context(request, by_row=row)
+            if len(inline_context['report_rows']) > 0:
+                return render_to_string('model_report/includes/report_inline.html', inline_context)
+        return ''
 
 
 @register.tag()
