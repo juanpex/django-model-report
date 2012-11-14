@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: app\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-10-03 00:56-0300\n"
-"PO-Revision-Date: 2012-10-03 00:57-0300\n"
+"POT-Creation-Date: 2012-11-13 23:21-0200\n"
+"PO-Revision-Date: 2012-11-13 23:21-0300\n"
 "Last-Translator: Juan Pablo Martínez <jpma55@gmail.com>\n"
 "Language-Team: juanpex <jpma55@gmail.com>\n"
 "Language: \n"
@@ -38,40 +38,55 @@ msgstr "Población"
 msgid "Populations"
 msgstr "Poblaciones"
 
-#: models.py:27
-#: models.py:38
+#: models.py:27 models.py:38 models.py:49
 msgid "Name"
 msgstr "Nombre"
 
 #: models.py:30
-msgid "Browser"
-msgstr "Navegador"
-
-#: models.py:31
-msgid "Browsers"
-msgstr "Navegadores"
-
-#: models.py:41
 msgid "OS"
 msgstr "SO:"
 
-#: models.py:42
+#: models.py:31
 msgid "OS's"
 msgstr "SO's"
 
-#: models.py:49
+#: models.py:41
+msgid "Support"
+msgstr "Soporte"
+
+#: models.py:42 models.py:52
+msgid "Supports"
+msgstr "Soporta"
+
+#: models.py:50
+msgid "Is Active?"
+msgstr "Esta Activo?"
+
+#: models.py:51
+msgid "Run On"
+msgstr "Corre en"
+
+#: models.py:55
+msgid "Browser"
+msgstr "Navegador"
+
+#: models.py:56
+msgid "Browsers"
+msgstr "Navegadores"
+
+#: models.py:63
 msgid "Download date"
 msgstr "Fecha de descarga"
 
-#: models.py:52
+#: models.py:66
 msgid "Username"
 msgstr "Nombre de usuario"
 
-#: models.py:55
+#: models.py:69
 msgid "Browser Download"
 msgstr "Descarga de Navegador"
 
-#: models.py:56
+#: models.py:70
 msgid "Browser Downloads"
 msgstr "Descargas de Navegadores"
 
@@ -89,17 +104,25 @@ msgstr "M %s"
 msgid "Mens"
 msgstr "Hombres"
 
-#: reports.py:55
+#: reports.py:54
 msgid "[Browser] Name"
 msgstr "[Navegador] Nombre"
 
-#: reports.py:59
+#: reports.py:58 reports.py:109
 msgid "[OS] Name"
 msgstr "[SO] Nombre"
 
-#: reports.py:92
+#: reports.py:91
 msgid "Browser with Inline Downloads"
 msgstr "Navegadores seguidos por Descargas"
+
+#: reports.py:113
+msgid "[Support] Name"
+msgstr "[Soporte] Nombre"
+
+#: reports.py:117
+msgid "Browser List"
+msgstr "Lista de Navegadores"
 
 #~ msgid "Men's"
 #~ msgstr "Hombres"
