@@ -23,23 +23,37 @@ class Population(models.Model):
         return u'With %s: %s' % (self.get_age_display().lower(), self.total())
 
 
-class Browser(models.Model):
-    name = models.CharField(_('Name'), max_length=25)
-
-    class Meta:
-        verbose_name = _('Browser')
-        verbose_name_plural = _('Browsers')
-
-    def __unicode__(self):
-        return self.name
-
-
 class OS(models.Model):
     name = models.CharField(_('Name'), max_length=25)
 
     class Meta:
         verbose_name = _('OS')
         verbose_name_plural = _("OS's")
+
+    def __unicode__(self):
+        return self.name
+
+
+class Support(models.Model):
+    name = models.CharField(_('Name'), max_length=25)
+
+    class Meta:
+        verbose_name = _('Support')
+        verbose_name_plural = _("Supports")
+
+    def __unicode__(self):
+        return self.name
+
+
+class Browser(models.Model):
+    name = models.CharField(_('Name'), max_length=25)
+    is_active = models.BooleanField(_('Is Active?'), default=True)
+    run_on = models.ManyToManyField(OS, verbose_name=_('Run On'), related_name='browsers', blank=True, null=True)
+    supports = models.ManyToManyField(Support, verbose_name=_('Supports'), related_name='browsers', blank=True, null=True)
+
+    class Meta:
+        verbose_name = _('Browser')
+        verbose_name_plural = _('Browsers')
 
     def __unicode__(self):
         return self.name

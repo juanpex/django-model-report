@@ -118,18 +118,21 @@ class ReportAdmin(object):
         self.parent_report = parent_report
         self.request = request
         model_fields = []
+        model_m2m_fields = []
         if parent_report:
             self.related_inline_field = [f for f, x in self.model._meta.get_fields_with_model() if f.rel and hasattr(f.rel, 'to') and f.rel.to is self.parent_report.model][0]
             self.related_inline_accessor = self.related_inline_field.related.get_accessor_name()
         for field in self.get_query_field_names():
             try:
+                m2mfields = []
                 if '__' in field:  # IF field has lookup
                     pre_field = None
                     base_model = self.model
                     for field_lookup in field.split("__"):
                         if not pre_field:
                             pre_field = base_model._meta.get_field_by_name(field_lookup)[0]
-
+                            if 'ManyToManyField' in unicode(pre_field):
+                                m2mfields.append(pre_field)
                         else:
                             base_model = pre_field.rel.to
                             pre_field = base_model._meta.get_field_by_name(field_lookup)[0]
@@ -144,7 +147,10 @@ class ReportAdmin(object):
             except IndexError:
                 raise ValueError('The field "%s" does not exist in model "%s".' % (field, self.model._meta.module_name))
             model_fields.append([model_field, field])
+            if m2mfields:
+                model_m2m_fields.append([model_field, field, len(model_fields) - 1, m2mfields])
         self.model_fields = model_fields
+        self.model_m2m_fields = model_m2m_fields
 
     def _get_grouper_text(self, groupby_field, value):
         try:
@@ -223,6 +229,9 @@ class ReportAdmin(object):
         qs = self.model.objects.all()
         for k, v in filter_kwargs.items():
             if not v is None and v != '':
+                if hasattr(v, 'values_list'):
+                    v = v.values_list('pk', flat=True)
+                    k = '%s__pk__in' % k.split("__")[0]
                 qs = qs.filter(Q(**{k: v}))
         return qs.distinct()
 
@@ -525,6 +534,9 @@ class ReportAdmin(object):
                     return {}
                 filter_kwargs = dict(self.cleaned_data)
                 for k, v in dict(filter_kwargs).items():
+                    if not v:
+                        filter_kwargs.pop(k)
+                        continue
                     if k == '__all__':
                         filter_kwargs.pop(k)
                         continue
@@ -602,7 +614,6 @@ class ReportAdmin(object):
             if callable(attr):
                 attr = attr()
             return attr
-
         qs = self.get_query_set(filter_kwargs)
         ffields = [f if 'self.' not in f else 'pk' for f in self.get_query_field_names() if f not in filter_related_fields]
         obfields = list(self.list_order_by)
@@ -682,7 +693,31 @@ class ReportAdmin(object):
             row.is_caption = True
             return row
 
+        def group_m2m_field_values(gqs_values):
+            values_results = []
+            m2m_indexes = [index for ffield, lkfield, index, field in self.model_m2m_fields]
+
+            def get_key_values(gqs_vals):
+                return [v if index not in m2m_indexes else None for index, v in enumerate(gqs_vals)]
+
+            res = groupby(gqs_values, key=get_key_values)
+            row_values = {}
+            for key, values in res:
+                row_values = dict([(index, []) for index in m2m_indexes])
+                for v in values:
+                    for index in m2m_indexes:
+                        if v[index] not in row_values[index]:
+                            row_values[index].append(v[index])
+                for index, vals in row_values.items():
+                    key[index] = vals
+                values_results.append(key)
+
+            return values_results
+
         qs_list = get_with_dotvalues(qs_list)
+        if self.model_m2m_fields:
+            qs_list = group_m2m_field_values(qs_list)
+
         if groupby_data and groupby_data['groupby']:
             g = groupby(qs_list, lambda x: x[ffields.index(groupby_data['groupby'])])
         else:
@@ -731,6 +766,8 @@ class ReportAdmin(object):
                 grouper = self._get_grouper_text(groupby_data['groupby'], grouper)
             else:
                 grouper = None
+            if isinstance(grouper, (list, tuple)):
+                grouper = grouper[0]
             report_rows.append([grouper, rows])
         if self.has_report_totals():
             header_report_total = compute_row_header(self.group_totals)

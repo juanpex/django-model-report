@@ -99,3 +99,43 @@ class BrowserReport(ReportAdmin):
 
 
 reports.register('browser-report', BrowserReport)
+
+
+def list_to_ul_format(value):
+    return '<ul>%s</ul>' % ''.join(['<li>%s</li>' % v for v in value])
+
+
+def run_on__name_label(report, field):
+    return _("[OS] Name")
+
+
+def supports__name_label(report, field):
+    return _("[Support] Name")
+
+
+class BrowserListReport(ReportAdmin):
+    title = _('Browser List')
+    model = Browser
+    fields = [
+        'name',
+        'run_on__name',
+        'supports__name',
+        'is_active',
+    ]
+    list_group_by = ('run_on__name', 'supports__name',)
+    list_filter = ('run_on__name', 'supports__name',)
+    list_order_by = ('name',)
+    type = 'chart'
+    chart_types = ('pie', 'column')
+    list_serie_fields = ('run_on__name', 'name')
+    override_field_formats = {
+        'run_on__name': list_to_ul_format,
+        'supports__name': list_to_ul_format,
+    }
+    override_field_labels = {
+        'run_on__name': run_on__name_label,
+        'supports__name': supports__name_label,
+    }
+
+
+reports.register('browser-list-report', BrowserListReport)
