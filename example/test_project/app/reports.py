@@ -6,11 +6,11 @@ from model_report.report import reports, ReportAdmin
 from model_report.utils import (avg_column, sum_column, count_column)
 
 
-def men_format(value):
+def men_format(value, instance):
     return _(u'M %s' % value)
 
 
-def women_format(value):
+def women_format(value, instance):
     return _(u'F %s' % value)
 
 
@@ -101,8 +101,14 @@ class BrowserReport(ReportAdmin):
 reports.register('browser-report', BrowserReport)
 
 
-def list_to_ul_format(value):
-    return '<ul>%s</ul>' % ''.join(['<li>%s</li>' % v for v in value])
+def list_to_ul_format(rvalue, instance):
+    if instance.is_value:
+        return '<ul>%s</ul>' % ''.join(['<li>%s</li>' % v for v in rvalue])
+    return rvalue.value[0]
+
+
+def list_to_value(rvalue, instance):
+    return rvalue[0] if len(rvalue) else None
 
 
 def run_on__name_label(report, field):
@@ -136,6 +142,13 @@ class BrowserListReport(ReportAdmin):
         'run_on__name': run_on__name_label,
         'supports__name': supports__name_label,
     }
+    # group_totals = {
+    #     'run_on__name': count_column,
+    #     'supports__name': count_column
+    # }
+    # report_totals = {
+    #     'supports__name': sum_column
+    # }
 
 
 reports.register('browser-list-report', BrowserListReport)

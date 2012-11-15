@@ -186,6 +186,10 @@ class ReportAdmin(object):
             pass
         return value
 
+    @cache_return
+    def get_m2m_field_names(self):
+        return [field for ffield, field, index, mfield in self.model_m2m_fields]
+
     def get_value_text(self, value, index, model_field):
         try:
             if not isinstance(model_field, (str, unicode)):
@@ -663,17 +667,23 @@ class ReportAdmin(object):
                 resources = new_resources
             return resources
 
-        def compute_row_totals(row_config, row_values):
+        def compute_row_totals(row_config, row_values, is_group_total=False, is_report_total=False):
             total_row = self.get_empty_row_asdict(self.fields, ReportValue(' '))
             for k, v in total_row.items():
                 if k in row_config:
                     fun = row_config[k]
                     value = fun(row_values[k])
+                    if k in self.get_m2m_field_names():
+                        value = ReportValue([value, ])
                     value = ReportValue(value)
+                    value.is_value = False
+                    value.is_group_total = is_group_total
+                    value.is_report_total = is_report_total
                     if k in self.override_field_values:
                         value.to_value = self.override_field_values[k]
                     if k in self.override_field_formats:
                         value.format = self.override_field_formats[k]
+                    value.is_m2m_value = (k in self.get_m2m_field_names())
                     total_row[k] = value
             row = self.reorder_dictrow(total_row)
             row = ReportRow(row)
@@ -684,7 +694,7 @@ class ReportAdmin(object):
             header_row = self.get_empty_row_asdict(self.fields, ReportValue(''))
             for k, fun in row_config.items():
                 if hasattr(fun, 'caption'):
-                    value = fun.caption
+                    value = force_unicode(fun.caption)
                 else:
                     value = '&nbsp;'
                 header_row[k] = value
@@ -711,7 +721,6 @@ class ReportAdmin(object):
                 for index, vals in row_values.items():
                     key[index] = vals
                 values_results.append(key)
-
             return values_results
 
         qs_list = get_with_dotvalues(qs_list)
@@ -733,6 +742,8 @@ class ReportAdmin(object):
                     for index, value in enumerate(resource):
                         if ffields[index] in self.group_totals:
                             row_group_totals[ffields[index]].append(value)
+                        elif ffields[index] in self.report_totals:
+                            row_report_totals[ffields[index]].append(value)
                         value = self._get_value_text(index, value)
                         value = ReportValue(value)
                         if ffields[index] in self.override_field_values:
@@ -744,7 +755,10 @@ class ReportAdmin(object):
                     for index, column in enumerate(ffields):
                         value = get_field_value(resource, column)
                         if ffields[index] in self.group_totals:
+
                             row_group_totals[ffields[index]].append(value)
+                        elif ffields[index] in self.report_totals:
+                            row_report_totals[ffields[index]].append(value)
                         value = self._get_value_text(index, value)
                         value = ReportValue(value)
                         if column in self.override_field_values:
@@ -757,11 +771,12 @@ class ReportAdmin(object):
             if row_group_totals:
                 if groupby_data['groupby']:
                     header_group_total = compute_row_header(self.group_totals)
-                    row = compute_row_totals(self.group_totals, row_group_totals)
+                    row = compute_row_totals(self.group_totals, row_group_totals, is_group_total=True)
                     rows.append(header_group_total)
                     rows.append(row)
                 for k, v in row_group_totals.items():
-                    row_report_totals[k].extend(v)
+                    if k in row_report_totals:
+                        row_report_totals[k].extend(v)
             if groupby_data and groupby_data['groupby']:
                 grouper = self._get_grouper_text(groupby_data['groupby'], grouper)
             else:
@@ -770,8 +785,8 @@ class ReportAdmin(object):
                 grouper = grouper[0]
             report_rows.append([grouper, rows])
         if self.has_report_totals():
-            header_report_total = compute_row_header(self.group_totals)
-            row = compute_row_totals(self.report_totals, row_report_totals)
+            header_report_total = compute_row_header(self.report_totals)
+            row = compute_row_totals(self.report_totals, row_report_totals, is_report_total=True)
             header_report_total.is_report_totals = True
             row.is_report_totals = True
             report_rows.append([_('Totals'), [header_report_total, row]])
