@@ -19,8 +19,8 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': PROJECT_ABSOLUTE_DIR + '/example.db',                      # Or path to database file if using sqlite3.
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': 'model_report',                      # Or path to database file if using sqlite3.
         'USER': 'jp',                      # Not used with sqlite3.
     }
 }
@@ -162,13 +162,6 @@ LOGGING = {
 try:
     # TO RUN LOCAL RUN: pip uninstall dj-database-url
     import dj_database_url
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',  # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-            'NAME': 'model_report',                      # Or path to database file if using sqlite3.
-            'USER': 'jp',                      # Not used with sqlite3.
-        }
-    }
     DATABASES = {'default': dj_database_url.config(default='postgres://localhost')}
 except Exception:
     pass
