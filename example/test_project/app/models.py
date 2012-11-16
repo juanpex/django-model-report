@@ -64,6 +64,7 @@ class BrowserDownload(models.Model):
     browser = models.ForeignKey(Browser)
     os = models.ForeignKey(OS, null=True, blank=True)
     username = models.CharField(_('Username'), max_length=25)
+    download_price = models.DecimalField(_('Download price'), decimal_places=2, max_digits=10, default=0)
 
     class Meta:
         verbose_name = _('Browser Download')

@@ -3,7 +3,7 @@ from django.utils.translation import ugettext_lazy as _
 from app.models import Population, Browser, BrowserDownload
 
 from model_report.report import reports, ReportAdmin
-from model_report.utils import (avg_column, sum_column, count_column)
+from model_report.utils import (usd_format, avg_column, sum_column, count_column)
 
 
 def men_format(value, instance):
@@ -65,6 +65,7 @@ class BrowserDownloadReport(ReportAdmin):
         'browser__name',
         'os__name',
         'username',
+        'download_price',
     ]
     list_filter = ('browser__name', 'os__name', 'download_date')
     list_order_by = ('download_date',)
@@ -75,11 +76,16 @@ class BrowserDownloadReport(ReportAdmin):
         'browser__name': browser__name_label,
         'os__name': os__name_label,
     }
+    override_field_formats = {
+        'download_price': usd_format,
+    }
     group_totals = {
         'download_date': count_column,
+        'download_price': avg_column,
     }
     report_totals = {
         'download_date': count_column,
+        'download_price': sum_column,
     }
     chart_types = ('pie', 'column')
 
@@ -142,13 +148,13 @@ class BrowserListReport(ReportAdmin):
         'run_on__name': run_on__name_label,
         'supports__name': supports__name_label,
     }
-    # group_totals = {
-    #     'run_on__name': count_column,
-    #     'supports__name': count_column
-    # }
-    # report_totals = {
-    #     'supports__name': sum_column
-    # }
+    group_totals = {
+        'run_on__name': count_column,
+        'supports__name': count_column
+    }
+    report_totals = {
+        'supports__name': sum_column
+    }
 
 
 reports.register('browser-list-report', BrowserListReport)
