@@ -122,6 +122,10 @@ class ReportAdmin(object):
         if parent_report:
             self.related_inline_field = [f for f, x in self.model._meta.get_fields_with_model() if f.rel and hasattr(f.rel, 'to') and f.rel.to is self.parent_report.model][0]
             self.related_inline_accessor = self.related_inline_field.related.get_accessor_name()
+            related_fields = ["%s__%s" % (pfield.model._meta.module_name, attname) for pfield, attname in self.parent_report.model_fields if pfield.model == self.related_inline_field.rel.to]
+            for x in related_fields:
+                if x in list(self.fields):
+                    self.fields.remove(x)
         for field in self.get_query_field_names():
             try:
                 m2mfields = []
