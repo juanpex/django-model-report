@@ -1014,10 +1014,37 @@
     }
   }, 
   {
+    "pk": 4, 
+    "model": "app.browser", 
+    "fields": {
+      "supports": [
+        5, 
+        6, 
+        7, 
+        8
+      ], 
+      "run_on": [
+        3, 
+        5, 
+        6, 
+        7
+      ], 
+      "is_active": true, 
+      "name": "I18n&\u00e9\u00d1*%$(\u00e2\u00c7"
+    }
+  }, 
+  {
     "pk": 1, 
     "model": "app.browser", 
     "fields": {
-      "supports": [], 
+      "supports": [
+        1, 
+        3, 
+        5, 
+        6, 
+        7, 
+        8
+      ], 
       "run_on": [
         1, 
         2, 
@@ -1029,27 +1056,46 @@
     }
   }, 
   {
-    "pk": 2, 
+    "pk": 5, 
     "model": "app.browser", 
     "fields": {
-      "supports": [], 
+      "supports": [
+        1, 
+        2, 
+        3, 
+        4, 
+        5, 
+        6, 
+        7, 
+        8
+      ], 
       "run_on": [
         1, 
         2, 
+        3, 
         4, 
         5, 
         6, 
         7
       ], 
       "is_active": true, 
-      "name": "Firefox"
+      "name": "Opera"
     }
   }, 
   {
     "pk": 3, 
     "model": "app.browser", 
     "fields": {
-      "supports": [], 
+      "supports": [
+        1, 
+        2, 
+        3, 
+        4, 
+        5, 
+        6, 
+        7, 
+        8
+      ], 
       "run_on": [
         1, 
         2, 
@@ -1063,36 +1109,29 @@
     }
   }, 
   {
-    "pk": 4, 
+    "pk": 2, 
     "model": "app.browser", 
     "fields": {
-      "supports": [], 
-      "run_on": [
-        3, 
-        5, 
-        6, 
-        7
-      ], 
-      "is_active": true, 
-      "name": "I18n&\u00e9\u00d1*%$#\";.:{<\u00ac~@\\|(\u00e2\u00c7"
-    }
-  }, 
-  {
-    "pk": 5, 
-    "model": "app.browser", 
-    "fields": {
-      "supports": [], 
-      "run_on": [
+      "supports": [
         1, 
         2, 
         3, 
         4, 
         5, 
         6, 
+        7, 
+        8
+      ], 
+      "run_on": [
+        1, 
+        2, 
+        4, 
+        5, 
+        6, 
         7
       ], 
       "is_active": true, 
-      "name": "Opera"
+      "name": "Firefox"
     }
   }, 
   {
@@ -1397,7 +1436,7 @@
     "model": "app.browserdownload", 
     "fields": {
       "username": "Wesley Finch", 
-      "download_price": "759.1", 
+      "download_price": "759.10", 
       "os": 6, 
       "download_date": "2012-09-06", 
       "browser": 5
@@ -1463,7 +1502,7 @@
     "model": "app.browserdownload", 
     "fields": {
       "username": "Hunter Lawrence", 
-      "download_price": "977.4", 
+      "download_price": "977.40", 
       "os": null, 
       "download_date": "2011-09-22", 
       "browser": 5
@@ -1551,7 +1590,7 @@
     "model": "app.browserdownload", 
     "fields": {
       "username": "Sebastian Lowe", 
-      "download_price": "546.3", 
+      "download_price": "546.30", 
       "os": null, 
       "download_date": "2011-12-06", 
       "browser": 2
@@ -1562,7 +1601,7 @@
     "model": "app.browserdownload", 
     "fields": {
       "username": "Lane Hopper", 
-      "download_price": "985.1", 
+      "download_price": "985.10", 
       "os": 7, 
       "download_date": "2013-02-01", 
       "browser": 2
@@ -1617,7 +1656,7 @@
     "model": "app.browserdownload", 
     "fields": {
       "username": "Clayton Reilly", 
-      "download_price": "172.8", 
+      "download_price": "172.80", 
       "os": 2, 
       "download_date": "2013-07-07", 
       "browser": 2
@@ -1727,7 +1766,7 @@
     "model": "app.browserdownload", 
     "fields": {
       "username": "Barrett Hess", 
-      "download_price": "957.8", 
+      "download_price": "957.80", 
       "os": 5, 
       "download_date": "2013-02-09", 
       "browser": 3
@@ -1936,7 +1975,7 @@
     "model": "app.browserdownload", 
     "fields": {
       "username": "Tucker Garrison", 
-      "download_price": "658.4", 
+      "download_price": "658.40", 
       "os": 5, 
       "download_date": "2011-12-18", 
       "browser": 5
@@ -1991,7 +2030,7 @@
     "model": "app.browserdownload", 
     "fields": {
       "username": "Nero Vega", 
-      "download_price": "940.5", 
+      "download_price": "940.50", 
       "os": 7, 
       "download_date": "2012-05-31", 
       "browser": 3
@@ -2057,7 +2096,7 @@
     "model": "app.browserdownload", 
     "fields": {
       "username": "Wade Bryant", 
-      "download_price": "358.5", 
+      "download_price": "358.50", 
       "os": 7, 
       "download_date": "2011-11-20", 
       "browser": 5
@@ -2079,7 +2118,7 @@
     "model": "app.browserdownload", 
     "fields": {
       "username": "Murphy Michael", 
-      "download_price": "609.8", 
+      "download_price": "609.80", 
       "os": 3, 
       "download_date": "2011-10-21", 
       "browser": 5
@@ -2178,7 +2217,7 @@
     "model": "app.browserdownload", 
     "fields": {
       "username": "Joseph Gilmore", 
-      "download_price": "14.1", 
+      "download_price": "14.10", 
       "os": 6, 
       "download_date": "2012-08-06", 
       "browser": 3
