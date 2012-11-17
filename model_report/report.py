@@ -119,13 +119,13 @@ class ReportAdmin(object):
         self.request = request
         model_fields = []
         model_m2m_fields = []
+        self.related_inline_field = None
+        self.related_inline_accessor = None
+        self.related_fields = []
         if parent_report:
             self.related_inline_field = [f for f, x in self.model._meta.get_fields_with_model() if f.rel and hasattr(f.rel, 'to') and f.rel.to is self.parent_report.model][0]
             self.related_inline_accessor = self.related_inline_field.related.get_accessor_name()
-            related_fields = ["%s__%s" % (pfield.model._meta.module_name, attname) for pfield, attname in self.parent_report.model_fields if pfield.model == self.related_inline_field.rel.to]
-            for x in related_fields:
-                if x in list(self.fields):
-                    self.fields.remove(x)
+            self.related_fields = ["%s__%s" % (pfield.model._meta.module_name, attname) for pfield, attname in self.parent_report.model_fields if pfield.model == self.related_inline_field.rel.to]
         for field in self.get_query_field_names():
             try:
                 m2mfields = []
@@ -211,7 +211,10 @@ class ReportAdmin(object):
         return dict(copy.deepcopy(erow))
 
     def reorder_dictrow(self, dictrow):
-        return [dictrow[field_name] for field_name in self.fields]
+        return [dictrow[field_name] for field_name in self.get_fields()]
+
+    def get_fields(self):
+        return [x for x in self.fields if not x in self.related_fields]
 
     def get_column_names(self, ignore_columns={}):
         values = []
@@ -225,7 +228,7 @@ class ReportAdmin(object):
     @cache_return
     def get_query_field_names(self):
         values = []
-        for field in self.fields:
+        for field in self.get_fields():
             if not 'self.' in field:
                 values.append(field.split(".")[0])
             else:
@@ -636,7 +639,7 @@ class ReportAdmin(object):
 
         def get_with_dotvalues(resources):
             # {1: 'field.method'}
-            dot_indexes = dict([(index, dot_field) for index, dot_field in enumerate(self.fields) if '.' in dot_field])
+            dot_indexes = dict([(index, dot_field) for index, dot_field in enumerate(self.get_fields()) if '.' in dot_field])
             dot_indexes_values = {}
 
             dot_model_fields = [(index, model_field[0]) for index, model_field in enumerate(self.model_fields) if index in dot_indexes]
@@ -672,7 +675,7 @@ class ReportAdmin(object):
             return resources
 
         def compute_row_totals(row_config, row_values, is_group_total=False, is_report_total=False):
-            total_row = self.get_empty_row_asdict(self.fields, ReportValue(' '))
+            total_row = self.get_empty_row_asdict(self.get_fields(), ReportValue(' '))
             for k, v in total_row.items():
                 if k in row_config:
                     fun = row_config[k]
@@ -695,7 +698,7 @@ class ReportAdmin(object):
             return row
 
         def compute_row_header(row_config):
-            header_row = self.get_empty_row_asdict(self.fields, ReportValue(''))
+            header_row = self.get_empty_row_asdict(self.get_fields(), ReportValue(''))
             for k, fun in row_config.items():
                 if hasattr(fun, 'caption'):
                     value = force_unicode(fun.caption)
