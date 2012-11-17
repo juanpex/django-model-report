@@ -70,7 +70,7 @@ class BrowserDownloadReport(ReportAdmin):
     list_filter = ('browser__name', 'os__name', 'download_date')
     list_order_by = ('download_date',)
     list_group_by = ('browser__name', 'os__name',)
-    list_serie_fields = ('browser__name', 'os__name')
+    list_serie_fields = ('browser__name', 'os__name', 'download_price')
     type = 'chart'
     override_field_labels = {
         'browser__name': browser__name_label,
@@ -87,7 +87,7 @@ class BrowserDownloadReport(ReportAdmin):
         'download_date': count_column,
         'download_price': sum_column,
     }
-    chart_types = ('pie', 'column')
+    chart_types = ('pie', 'column', 'line')
 
 
 reports.register('browser-download-report', BrowserDownloadReport)

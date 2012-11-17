@@ -39,7 +39,7 @@ class DictObject:
     def __repr__(self):
         data = {}
         for k, v in self.__dict__.items():
-            if v and v != 'null':
+            if v != 'null':
                 if isinstance(v, (type(ugettext_lazy(' ')))):
                     v = _(v)
                 if isinstance(v, (bool)):

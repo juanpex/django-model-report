@@ -142,6 +142,49 @@ class HighchartRender(object):
         self.model.plotOptions.column.colorByPoint = true
         self.model.legend.enabled = false
 
+    def set_line_chart_options(self, report_rows):
+        xAxis_categories = []
+        max_length = 0
+        for grouper, rows in report_rows:
+            add_group = True
+            if self.config['has_report_totals']:
+                if len(rows) <= 2:
+                    add_group = False
+            if not add_group:
+                continue
+            serie_values = []
+            for row in rows:
+                if row.is_value():
+                    value = row[self.config['serie_field']].value
+                    if not is_numeric(value):
+                        value = 1  # TOOD: Map serie_field with posible serie_operator
+                    serie_values.append(float(value))
+
+            grouper = unicodeToHTMLEntities(grouper)
+            xAxis_categories.append(grouper)
+            data = self.model.serie_obj.create(**{
+                'name': grouper,
+                'data': serie_values,
+            })
+            self.model.series.add(data)
+            if len(serie_values) > max_length:
+                max_length = len(serie_values)
+
+        xAxis_categories = range(1, max_length + 1)
+        self.model.chart.renderTo = 'container'
+        self.model.chart.type = 'line'
+
+        self.model.title.text = self.config['title']
+        self.model.xAxis.categories = xAxis_categories
+
+        self.model.yAxis.title.text = 'USD'
+
+        self.model.plotOptions.line.dataLabels.edabled = true
+        self.model.plotOptions.line.enableMouseTracking = false
+
+        self.model.tooltip.enabled = true
+        self.model.tooltip.formatter = "function() { return '<b>'+this.series.name+'</b> '+this.x+': '+this.y; }"
+
     def is_valid(self):
         if self.config:
             if 'serie_field' in self.config and not self.config['serie_field'] is None:
@@ -157,6 +200,9 @@ class HighchartRender(object):
             if self.config['chart_mode'] == 'column':
                 self.model.credits.enabled = false
                 self.set_bar_chart_options(report_rows)
+            if self.config['chart_mode'] == 'line':
+                self.model.credits.enabled = false
+                self.set_line_chart_options(report_rows)
         return self
 
     @property

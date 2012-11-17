@@ -18,7 +18,7 @@ def sum_column(values):
     if not values:
         return Decimal(0.00)
     if isinstance(values[0], (list, tuple)):
-        return Decimal([v if str.isdigit(str(v[0] if isinstance(v, (list, tuple)) else v)) else 1 for v in values])
+        return Decimal(sum([v if str.isdigit(str(v[0] if isinstance(v, (list, tuple)) else v)) else 1 for v in values]))
     return Decimal(sum(values))
 sum_column.caption = _('Total')
 
