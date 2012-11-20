@@ -1,9 +1,22 @@
 # -*- coding: utf-8 -*-
 from django.utils.translation import ugettext_lazy as _
-from app.models import Population, Browser, BrowserDownload
+from app.models import OS, Population, Browser, BrowserDownload
 
 from model_report.report import reports, ReportAdmin
 from model_report.utils import (usd_format, avg_column, sum_column, count_column)
+
+
+class OSReport(ReportAdmin):
+    model = OS
+    fields = [
+        'company__name',
+        'name',
+    ]
+    list_filter = ('company__name',)
+    type = 'report'
+
+
+reports.register('os-report', OSReport)
 
 
 def men_format(value, instance):
@@ -58,23 +71,29 @@ def os__name_label(report, field):
     return _("[OS] Name")
 
 
+def os__company__name_label(report, field):
+    return _("[OS > Company] Name")
+
+
 class BrowserDownloadReport(ReportAdmin):
     model = BrowserDownload
     fields = [
         'download_date',
         'browser__name',
         'os__name',
+        'os__company__name',
         'username',
         'download_price',
     ]
-    list_filter = ('browser__name', 'os__name', 'download_date')
+    list_filter = ('browser__name', 'os__name', 'download_date', 'os__company__name',)
     list_order_by = ('download_date',)
-    list_group_by = ('browser__name', 'os__name',)
+    list_group_by = ('browser__name', 'os__name', 'os__company__name',)
     list_serie_fields = ('browser__name', 'os__name', 'download_price')
     type = 'chart'
     override_field_labels = {
         'browser__name': browser__name_label,
         'os__name': os__name_label,
+        'os__company__name': os__company__name_label,
     }
     override_field_formats = {
         'download_price': usd_format,

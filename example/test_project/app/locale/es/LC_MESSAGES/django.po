@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: app\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-11-13 23:21-0200\n"
-"PO-Revision-Date: 2012-11-13 23:21-0300\n"
+"POT-Creation-Date: 2012-11-20 20:18-0200\n"
+"PO-Revision-Date: 2012-11-20 20:18-0300\n"
 "Last-Translator: Juan Pablo Martínez <jpma55@gmail.com>\n"
 "Language-Team: juanpex <jpma55@gmail.com>\n"
 "Language: \n"
@@ -38,89 +38,111 @@ msgstr "Población"
 msgid "Populations"
 msgstr "Poblaciones"
 
-#: models.py:27 models.py:38 models.py:49
+#: models.py:27
+#: models.py:38
+#: models.py:50
+#: models.py:61
 msgid "Name"
 msgstr "Nombre"
 
 #: models.py:30
-msgid "OS"
-msgstr "SO:"
+#: models.py:39
+msgid "Company"
+msgstr "Empresa"
 
 #: models.py:31
-msgid "OS's"
-msgstr "SO's"
+msgid "Companies"
+msgstr "Empresas"
 
-#: models.py:41
+#: models.py:42
+msgid "OS"
+msgstr "Sistema Operativo"
+
+#: models.py:43
+msgid "OS's"
+msgstr "Sistemas Operativos"
+
+#: models.py:53
 msgid "Support"
 msgstr "Soporte"
 
-#: models.py:42 models.py:52
+#: models.py:54
+#: models.py:64
 msgid "Supports"
 msgstr "Soporta"
 
-#: models.py:50
+#: models.py:62
 msgid "Is Active?"
 msgstr "Esta Activo?"
 
-#: models.py:51
+#: models.py:63
 msgid "Run On"
 msgstr "Corre en"
 
-#: models.py:55
+#: models.py:67
 msgid "Browser"
 msgstr "Navegador"
 
-#: models.py:56
+#: models.py:68
 msgid "Browsers"
 msgstr "Navegadores"
 
-#: models.py:63
+#: models.py:75
 msgid "Download date"
 msgstr "Fecha de descarga"
 
-#: models.py:66
+#: models.py:78
 msgid "Username"
 msgstr "Nombre de usuario"
 
-#: models.py:69
+#: models.py:79
+msgid "Download price"
+msgstr "Precio de descarga"
+
+#: models.py:82
 msgid "Browser Download"
 msgstr "Descarga de Navegador"
 
-#: models.py:70
+#: models.py:83
 msgid "Browser Downloads"
 msgstr "Descargas de Navegadores"
 
-#: reports.py:10
+#: reports.py:23
 #, python-format
 msgid "M %s"
 msgstr "H %s"
 
-#: reports.py:14
+#: reports.py:27
 #, python-format
 msgid "F %s"
 msgstr "M %s"
 
-#: reports.py:18
+#: reports.py:31
 msgid "Mens"
 msgstr "Hombres"
 
-#: reports.py:54
+#: reports.py:67
 msgid "[Browser] Name"
 msgstr "[Navegador] Nombre"
 
-#: reports.py:58 reports.py:109
+#: reports.py:71
+#: reports.py:140
 msgid "[OS] Name"
 msgstr "[SO] Nombre"
 
-#: reports.py:91
+#: reports.py:75
+msgid "[OS > Company] Name"
+msgstr "[SO > Empresa] Nombre"
+
+#: reports.py:116
 msgid "Browser with Inline Downloads"
 msgstr "Navegadores seguidos por Descargas"
 
-#: reports.py:113
+#: reports.py:144
 msgid "[Support] Name"
 msgstr "[Soporte] Nombre"
 
-#: reports.py:117
+#: reports.py:148
 msgid "Browser List"
 msgstr "Lista de Navegadores"
 

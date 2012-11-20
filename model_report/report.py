@@ -506,8 +506,19 @@ class ReportAdmin(object):
             opts = self.model._meta
             for k, v in dict(form_fields).items():
                 if v is None:
-                    field_name = k.split("__")[0]
-                    model_field = opts.get_field_by_name(field_name)[0]
+                    pre_field = None
+                    base_model = self.model
+                    if '__' in k:
+                        for field_lookup in k.split("__")[:-1]:
+                            if not pre_field:
+                                pre_field = base_model._meta.get_field_by_name(field_lookup)[0]
+                            else:
+                                base_model = pre_field.rel.to
+                                pre_field = base_model._meta.get_field_by_name(field_lookup)[0]
+                        model_field = pre_field
+                    else:
+                        field_name = k.split("__")[0]
+                        model_field = opts.get_field_by_name(field_name)[0]
                     if isinstance(model_field, (DateField, DateTimeField)):
                         form_fields.pop(k)
                         form_fields[k] = RangeField(model_field.formfield)

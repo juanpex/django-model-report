@@ -1,8 +1,10 @@
 # -*- encoding: utf-8 -*-
 from django.contrib import admin
 
-from app.models import Population, Browser, BrowserDownload, OS, Support
+from app.models import Population, Browser, BrowserDownload, OS, Support, Company
 
+
+admin.site.register(Company)
 admin.site.register(Population)
 admin.site.register(Browser)
 admin.site.register(OS)

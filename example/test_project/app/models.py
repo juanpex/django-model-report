@@ -23,8 +23,20 @@ class Population(models.Model):
         return u'With %s: %s' % (self.get_age_display().lower(), self.total())
 
 
+class Company(models.Model):
+    name = models.CharField(_('Name'), max_length=25)
+
+    class Meta:
+        verbose_name = _('Company')
+        verbose_name_plural = _("Companies")
+
+    def __unicode__(self):
+        return self.name
+
+
 class OS(models.Model):
     name = models.CharField(_('Name'), max_length=25)
+    company = models.ForeignKey(Company, verbose_name=_('Company'), null=True, blank=True)
 
     class Meta:
         verbose_name = _('OS')
