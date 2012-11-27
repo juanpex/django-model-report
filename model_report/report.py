@@ -17,6 +17,7 @@ from model_report.utils import base_label, ReportValue, ReportRow
 from model_report.highcharts import HighchartRender
 from model_report.widgets import RangeField
 from model_report.export_pdf import render_to_pdf
+from django.db.models.related import RelatedObject
 
 try:
     from collections import OrderedDict
@@ -135,8 +136,11 @@ class ReportAdmin(object):
                     for field_lookup in field.split("__"):
                         if not pre_field:
                             pre_field = base_model._meta.get_field_by_name(field_lookup)[0]
-                            if 'ManyToManyField' in unicode(pre_field):
+                            if 'ManyToManyField' in unicode(pre_field) or isinstance(pre_field, RelatedObject):
                                 m2mfields.append(pre_field)
+                        elif isinstance(pre_field, RelatedObject):
+                            base_model = pre_field.model
+                            pre_field = base_model._meta.get_field_by_name(field_lookup)[0]
                         else:
                             base_model = pre_field.rel.to
                             pre_field = base_model._meta.get_field_by_name(field_lookup)[0]
