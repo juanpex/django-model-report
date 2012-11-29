@@ -515,7 +515,7 @@ class ReportAdmin(object):
                     base_model = self.model
 
                     if '__' in k:
-                        for field_lookup in k.split("__"):
+                        for field_lookup in k.split("__")[:-1]:
                             if pre_field:
                                 if isinstance(pre_field, RelatedObject):
                                     base_model = pre_field.model
@@ -532,7 +532,16 @@ class ReportAdmin(object):
                         form_fields.pop(k)
                         form_fields[k] = RangeField(model_field.formfield)
                     else:
-                        field = model_field.formfield()
+                        if not hasattr(model_field, 'formfield'):
+                            field = forms.ChoiceField()
+                            field.label = 'add the stupid label'
+                            field.help_text = 'help text, if any'
+                            field.choices = [(x.pk, getattr(x, k.split("__")[-1])) for x in model_field.model.objects.all()]
+                            if len(field.choices):
+                                field.choices.insert(0, ('', '---------'))
+                                field.initial = ''
+                        else:
+                            field = model_field.formfield()
                         field.label = force_unicode(_(field.label))
                         form_fields[k] = field
                 else:
