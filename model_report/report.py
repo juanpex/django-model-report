@@ -154,6 +154,7 @@ class ReportAdmin(object):
                         model_field = field
             except IndexError:
                 raise ValueError('The field "%s" does not exist in model "%s".' % (field, self.model._meta.module_name))
+
             model_fields.append([model_field, field])
             if m2mfields:
                 model_m2m_fields.append([model_field, field, len(model_fields) - 1, m2mfields])
@@ -512,17 +513,21 @@ class ReportAdmin(object):
                 if v is None:
                     pre_field = None
                     base_model = self.model
+
                     if '__' in k:
-                        for field_lookup in k.split("__")[:-1]:
-                            if not pre_field:
-                                pre_field = base_model._meta.get_field_by_name(field_lookup)[0]
-                            else:
-                                base_model = pre_field.rel.to
-                                pre_field = base_model._meta.get_field_by_name(field_lookup)[0]
+                        for field_lookup in k.split("__"):
+                            if pre_field:
+                                if isinstance(pre_field, RelatedObject):
+                                    base_model = pre_field.model
+                                else:
+                                    base_model = pre_field.rel.to
+
+                            pre_field = base_model._meta.get_field_by_name(field_lookup)[0]
                         model_field = pre_field
                     else:
                         field_name = k.split("__")[0]
                         model_field = opts.get_field_by_name(field_name)[0]
+
                     if isinstance(model_field, (DateField, DateTimeField)):
                         form_fields.pop(k)
                         form_fields[k] = RangeField(model_field.formfield)
