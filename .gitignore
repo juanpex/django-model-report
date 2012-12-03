@@ -5,3 +5,8 @@ local_settings.py
 .venv
 *.egg*
 docs
+
+# IDE files
+.project
+.pydevproject
+.settings/*
