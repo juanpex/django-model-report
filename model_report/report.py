@@ -533,13 +533,9 @@ class ReportAdmin(object):
                         form_fields[k] = RangeField(model_field.formfield)
                     else:
                         if not hasattr(model_field, 'formfield'):
-                            field = forms.ChoiceField()
-                            field.label = 'add the stupid label'
-                            field.help_text = 'help text, if any'
-                            field.choices = [(x.pk, getattr(x, k.split("__")[-1])) for x in model_field.model.objects.all()]
-                            if len(field.choices):
-                                field.choices.insert(0, ('', '---------'))
-                                field.initial = ''
+                            field = forms.ModelChoiceField(queryset=model_field.model.objects.all())
+                            field.label = self.override_field_labels.get(k, base_label)(self, field) if k in self.override_field_labels else field_lookup
+#                            field.help_text = 'help text, if any'
                         else:
                             field = model_field.formfield()
                         field.label = force_unicode(_(field.label))
