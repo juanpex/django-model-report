@@ -111,6 +111,7 @@ class ReportAdmin(object):
     override_field_values = {}
     override_field_formats = {}
     override_field_labels = {}
+    override_field_choices = {}
     chart_types = ()
     exports = ('excel', 'pdf')
     inlines = []
@@ -538,6 +539,12 @@ class ReportAdmin(object):
 #                            field.help_text = 'help text, if any'
                         else:
                             field = model_field.formfield()
+
+                        # Provide a hook for updating the queryset
+                        if k in self.override_field_choices:
+                            field.queryset = self.override_field_choices.get(k)(field.queryset)
+
+
                         field.label = force_unicode(_(field.label))
                         form_fields[k] = field
                 else:
