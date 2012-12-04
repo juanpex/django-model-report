@@ -112,6 +112,7 @@ class ReportAdmin(object):
     override_field_formats = {}
     override_field_labels = {}
     override_field_choices = {}
+    override_field_filter_values = {}
     chart_types = ()
     exports = ('excel', 'pdf')
     inlines = []
@@ -657,6 +658,11 @@ class ReportAdmin(object):
             if callable(attr):
                 attr = attr()
             return attr
+
+        for kwarg, value in filter_kwargs.items():
+            if kwarg in self.override_field_filter_values:
+                filter_kwargs[kwarg] = self.override_field_labels.get(kwarg)(self, value)
+
         qs = self.get_query_set(filter_kwargs)
         ffields = [f if 'self.' not in f else 'pk' for f in self.get_query_field_names() if f not in filter_related_fields]
         obfields = list(self.list_order_by)
