@@ -537,14 +537,12 @@ class ReportAdmin(object):
                         if not hasattr(model_field, 'formfield'):
                             field = forms.ModelChoiceField(queryset=model_field.model.objects.all())
                             field.label = self.override_field_labels.get(k, base_label)(self, field) if k in self.override_field_labels else field_lookup
-#                            field.help_text = 'help text, if any'
                         else:
                             field = model_field.formfield()
 
                         # Provide a hook for updating the queryset
                         if k in self.override_field_choices:
                             field.queryset = self.override_field_choices.get(k)(field.queryset)
-
 
                         field.label = force_unicode(_(field.label))
                         form_fields[k] = field
@@ -661,7 +659,7 @@ class ReportAdmin(object):
 
         for kwarg, value in filter_kwargs.items():
             if kwarg in self.override_field_filter_values:
-                filter_kwargs[kwarg] = self.override_field_labels.get(kwarg)(self, value)
+                filter_kwargs[kwarg] = self.override_field_filter_values.get(kwarg)(self, value)
 
         qs = self.get_query_set(filter_kwargs)
         ffields = [f if 'self.' not in f else 'pk' for f in self.get_query_field_names() if f not in filter_related_fields]
