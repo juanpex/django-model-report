@@ -1,9 +1,32 @@
 # -*- coding: utf-8 -*-
 from django.utils.translation import ugettext_lazy as _
-from app.models import OS, Population, Browser, BrowserDownload
+from app.models import OS, Population, Browser, BrowserDownload, ResolutionByYear
 
 from model_report.report import reports, ReportAdmin
 from model_report.utils import (usd_format, avg_column, sum_column, count_column)
+
+
+class ResolutionByYearReport(ReportAdmin):
+    model = ResolutionByYear
+    fields = [
+        'date',
+        'date__year',
+        'date__month',
+        'date__day',
+        'resolution',
+        'percentage',
+    ]
+    list_group_by = ('date__year', 'date__month',)
+    list_filter = ('resolution',)
+    type = 'report'
+    override_field_labels = {
+        'date__year': lambda x, y: _('Year'),
+        'date__month': lambda x, y: _('Month'),
+        'date__day': lambda x, y: _('Day'),
+    }
+
+
+reports.register('resolution-by-year-report', ResolutionByYearReport)
 
 
 class OSReport(ReportAdmin):

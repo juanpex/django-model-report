@@ -138,8 +138,11 @@ class ReportAdmin(object):
                             if 'ManyToManyField' in unicode(pre_field):
                                 m2mfields.append(pre_field)
                         else:
-                            base_model = pre_field.rel.to
-                            pre_field = base_model._meta.get_field_by_name(field_lookup)[0]
+                            if 'Date' in unicode(pre_field):
+                                pre_field = pre_field
+                            else:
+                                base_model = pre_field.rel.to
+                                pre_field = base_model._meta.get_field_by_name(field_lookup)[0]
                     model_field = pre_field
                 else:
                     if not 'self.' in field:
@@ -638,6 +641,22 @@ class ReportAdmin(object):
             return attr
         qs = self.get_query_set(filter_kwargs)
         ffields = [f if 'self.' not in f else 'pk' for f in self.get_query_field_names() if f not in filter_related_fields]
+        extra_ffield = []
+        for f in list(ffields):
+            if '__' in f:
+                for field, name in self.model_fields:
+                    if name == f:
+                        if 'fields.Date' in unicode(field):
+                            fname, flookup = f.split('__')
+                            if not flookup in ('year', 'month', 'day'):
+                                break
+                            if flookup == 'year':
+                                extra_ffield.append([f, "strftime('%%Y', date)"])
+                            if flookup == 'month':
+                                extra_ffield.append([f, "strftime('%%m', date)"])
+                            if flookup == 'day':
+                                extra_ffield.append([f, "strftime('%%d', date)"])
+                        break
         obfields = list(self.list_order_by)
         if groupby_data and groupby_data['groupby']:
             if groupby_data['groupby'] in obfields:
@@ -645,6 +664,8 @@ class ReportAdmin(object):
             obfields.insert(0, groupby_data['groupby'])
         qs = self.filter_query(qs)
         qs = qs.order_by(*obfields)
+        if extra_ffield:
+            qs = qs.extra(select=dict(extra_ffield))
         qs = qs.values_list(*ffields)
         qs_list = list(qs)
 

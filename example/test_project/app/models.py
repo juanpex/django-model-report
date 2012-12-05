@@ -6,6 +6,30 @@ from django.utils.translation import ugettext_lazy as _
 
 AGE_IN_YEARS = enumerate(['Less than one year', '1 year'] + ['%s years' % x for x in range(2, 100)] + ['100 or more years', ])
 
+RESOLUTION_CHOICES = (
+    ('Higher', 'Higher'),
+    ('1024x768', '1024x768'),
+    ('800x600', '800x600'),
+    ('640x480', '640x480'),
+    ('Other', 'Other'),
+)
+
+
+class ResolutionByYear(models.Model):
+    date = models.DateTimeField(_('Date'))
+    resolution = models.CharField(_('Resolution'), max_length=10, choices=RESOLUTION_CHOICES, blank=False, null=False)
+    percentage = models.PositiveIntegerField(_('Percentage'), default=0)
+
+    class Meta:
+        verbose_name = _('Resolution by year')
+        verbose_name_plural = _('Resolutions by year')
+
+    def date_text(self):
+        return u'%s - %s' % (self.date.strftime('%B %Y'), self.get_resolution_display())
+
+    def __unicode__(self):
+        return u'%s - %s: %s' % (self.date.strftime('%B %Y'), self.get_resolution_display(), self.percentage)
+
 
 class Population(models.Model):
     age = models.IntegerField(_('Age'), choices=AGE_IN_YEARS)
