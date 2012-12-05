@@ -564,7 +564,6 @@ class ReportAdmin(object):
                         form_fields.pop(k)
                         form_fields[k] = RangeField(model_field.formfield)
 
-                    form_fields[k].required = False
                     if hasattr(form_fields[k], 'choices'):
                         if not hasattr(form_fields[k], 'queryset'):
                             if form_fields[k].choices[0][0]:
@@ -626,6 +625,9 @@ class ReportAdmin(object):
                                     field.queryset = qs.filter(Q(**{k: v}))
                 except:
                     pass
+
+                for field in self.fields:
+                    self.fields[field].required = False
 
         form = FilterForm(data=request.GET or None)
         form.is_valid()
