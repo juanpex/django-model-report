@@ -1,6 +1,591 @@
 [
   {
     "pk": 1, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2012-01-01T06:00:00Z", 
+      "percentage": 85, 
+      "resolution": "Higher"
+    }
+  }, 
+  {
+    "pk": 2, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2011-01-01T06:00:00Z", 
+      "percentage": 85, 
+      "resolution": "Higher"
+    }
+  }, 
+  {
+    "pk": 3, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2010-01-01T06:00:00Z", 
+      "percentage": 76, 
+      "resolution": "Higher"
+    }
+  }, 
+  {
+    "pk": 4, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2009-01-01T06:00:00Z", 
+      "percentage": 57, 
+      "resolution": "Higher"
+    }
+  }, 
+  {
+    "pk": 5, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2008-01-01T06:00:00Z", 
+      "percentage": 38, 
+      "resolution": "Higher"
+    }
+  }, 
+  {
+    "pk": 6, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2007-01-01T06:00:00Z", 
+      "percentage": 26, 
+      "resolution": "Higher"
+    }
+  }, 
+  {
+    "pk": 7, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2006-01-01T06:00:00Z", 
+      "percentage": 17, 
+      "resolution": "Higher"
+    }
+  }, 
+  {
+    "pk": 8, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2005-01-01T06:00:00Z", 
+      "percentage": 12, 
+      "resolution": "Higher"
+    }
+  }, 
+  {
+    "pk": 9, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2004-01-01T06:00:00Z", 
+      "percentage": 10, 
+      "resolution": "Higher"
+    }
+  }, 
+  {
+    "pk": 10, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2003-01-01T06:00:00Z", 
+      "percentage": 6, 
+      "resolution": "Higher"
+    }
+  }, 
+  {
+    "pk": 11, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2002-01-01T06:00:00Z", 
+      "percentage": 6, 
+      "resolution": "Higher"
+    }
+  }, 
+  {
+    "pk": 12, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2001-01-01T06:00:00Z", 
+      "percentage": 5, 
+      "resolution": "Higher"
+    }
+  }, 
+  {
+    "pk": 13, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2000-01-01T06:00:00Z", 
+      "percentage": 4, 
+      "resolution": "Higher"
+    }
+  }, 
+  {
+    "pk": 14, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2012-01-01T06:00:00Z", 
+      "percentage": 13, 
+      "resolution": "1024x768"
+    }
+  }, 
+  {
+    "pk": 15, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2011-01-01T06:00:00Z", 
+      "percentage": 14, 
+      "resolution": "1024x768"
+    }
+  }, 
+  {
+    "pk": 16, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2010-01-01T06:00:00Z", 
+      "percentage": 20, 
+      "resolution": "1024x768"
+    }
+  }, 
+  {
+    "pk": 17, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2009-01-01T06:00:00Z", 
+      "percentage": 36, 
+      "resolution": "1024x768"
+    }
+  }, 
+  {
+    "pk": 18, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2008-01-01T06:00:00Z", 
+      "percentage": 48, 
+      "resolution": "1024x768"
+    }
+  }, 
+  {
+    "pk": 19, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2007-01-01T06:00:00Z", 
+      "percentage": 54, 
+      "resolution": "1024x768"
+    }
+  }, 
+  {
+    "pk": 20, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2006-01-01T06:00:00Z", 
+      "percentage": 57, 
+      "resolution": "1024x768"
+    }
+  }, 
+  {
+    "pk": 21, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2005-01-01T06:00:00Z", 
+      "percentage": 53, 
+      "resolution": "1024x768"
+    }
+  }, 
+  {
+    "pk": 22, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2004-01-01T06:00:00Z", 
+      "percentage": 47, 
+      "resolution": "1024x768"
+    }
+  }, 
+  {
+    "pk": 23, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2003-01-01T06:00:00Z", 
+      "percentage": 40, 
+      "resolution": "1024x768"
+    }
+  }, 
+  {
+    "pk": 24, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2002-01-01T06:00:00Z", 
+      "percentage": 34, 
+      "resolution": "1024x768"
+    }
+  }, 
+  {
+    "pk": 25, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2001-01-01T06:00:00Z", 
+      "percentage": 29, 
+      "resolution": "1024x768"
+    }
+  }, 
+  {
+    "pk": 26, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2000-01-01T06:00:00Z", 
+      "percentage": 25, 
+      "resolution": "1024x768"
+    }
+  }, 
+  {
+    "pk": 27, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2012-01-01T06:00:00Z", 
+      "percentage": 1, 
+      "resolution": "800x600"
+    }
+  }, 
+  {
+    "pk": 28, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2011-01-01T06:00:00Z", 
+      "percentage": 0, 
+      "resolution": "800x600"
+    }
+  }, 
+  {
+    "pk": 29, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2010-01-01T06:00:00Z", 
+      "percentage": 1, 
+      "resolution": "800x600"
+    }
+  }, 
+  {
+    "pk": 30, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2009-01-01T06:00:00Z", 
+      "percentage": 4, 
+      "resolution": "800x600"
+    }
+  }, 
+  {
+    "pk": 31, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2008-01-01T06:00:00Z", 
+      "percentage": 8, 
+      "resolution": "800x600"
+    }
+  }, 
+  {
+    "pk": 32, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2007-01-01T06:00:00Z", 
+      "percentage": 14, 
+      "resolution": "800x600"
+    }
+  }, 
+  {
+    "pk": 33, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2006-01-01T06:00:00Z", 
+      "percentage": 20, 
+      "resolution": "800x600"
+    }
+  }, 
+  {
+    "pk": 34, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2005-01-01T06:00:00Z", 
+      "percentage": 30, 
+      "resolution": "800x600"
+    }
+  }, 
+  {
+    "pk": 35, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2004-01-01T06:00:00Z", 
+      "percentage": 37, 
+      "resolution": "800x600"
+    }
+  }, 
+  {
+    "pk": 36, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2003-01-01T06:00:00Z", 
+      "percentage": 47, 
+      "resolution": "800x600"
+    }
+  }, 
+  {
+    "pk": 37, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2002-01-01T06:00:00Z", 
+      "percentage": 52, 
+      "resolution": "800x600"
+    }
+  }, 
+  {
+    "pk": 38, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2001-01-01T06:00:00Z", 
+      "percentage": 55, 
+      "resolution": "800x600"
+    }
+  }, 
+  {
+    "pk": 39, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2000-01-01T06:00:00Z", 
+      "percentage": 56, 
+      "resolution": "800x600"
+    }
+  }, 
+  {
+    "pk": 40, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2012-01-01T06:00:00Z", 
+      "percentage": 0, 
+      "resolution": "640x480"
+    }
+  }, 
+  {
+    "pk": 41, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2011-01-01T06:00:00Z", 
+      "percentage": 0, 
+      "resolution": "640x480"
+    }
+  }, 
+  {
+    "pk": 42, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2010-01-01T06:00:00Z", 
+      "percentage": 0, 
+      "resolution": "640x480"
+    }
+  }, 
+  {
+    "pk": 43, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2009-01-01T06:00:00Z", 
+      "percentage": 0, 
+      "resolution": "640x480"
+    }
+  }, 
+  {
+    "pk": 44, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2008-01-01T06:00:00Z", 
+      "percentage": 0, 
+      "resolution": "640x480"
+    }
+  }, 
+  {
+    "pk": 45, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2007-01-01T06:00:00Z", 
+      "percentage": 0, 
+      "resolution": "640x480"
+    }
+  }, 
+  {
+    "pk": 46, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2006-01-01T06:00:00Z", 
+      "percentage": 0, 
+      "resolution": "640x480"
+    }
+  }, 
+  {
+    "pk": 47, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2005-01-01T06:00:00Z", 
+      "percentage": 0, 
+      "resolution": "640x480"
+    }
+  }, 
+  {
+    "pk": 48, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2004-01-01T06:00:00Z", 
+      "percentage": 1, 
+      "resolution": "640x480"
+    }
+  }, 
+  {
+    "pk": 49, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2003-01-01T06:00:00Z", 
+      "percentage": 2, 
+      "resolution": "640x480"
+    }
+  }, 
+  {
+    "pk": 50, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2002-01-01T06:00:00Z", 
+      "percentage": 3, 
+      "resolution": "640x480"
+    }
+  }, 
+  {
+    "pk": 51, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2001-01-01T06:00:00Z", 
+      "percentage": 6, 
+      "resolution": "640x480"
+    }
+  }, 
+  {
+    "pk": 52, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2000-01-01T06:00:00Z", 
+      "percentage": 11, 
+      "resolution": "640x480"
+    }
+  }, 
+  {
+    "pk": 53, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2012-01-01T06:00:00Z", 
+      "percentage": 1, 
+      "resolution": "Other"
+    }
+  }, 
+  {
+    "pk": 54, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2011-01-01T06:00:00Z", 
+      "percentage": 1, 
+      "resolution": "Other"
+    }
+  }, 
+  {
+    "pk": 55, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2010-01-01T06:00:00Z", 
+      "percentage": 3, 
+      "resolution": "Other"
+    }
+  }, 
+  {
+    "pk": 56, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2009-01-01T06:00:00Z", 
+      "percentage": 3, 
+      "resolution": "Other"
+    }
+  }, 
+  {
+    "pk": 57, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2008-01-01T06:00:00Z", 
+      "percentage": 6, 
+      "resolution": "Other"
+    }
+  }, 
+  {
+    "pk": 58, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2007-01-01T06:00:00Z", 
+      "percentage": 6, 
+      "resolution": "Other"
+    }
+  }, 
+  {
+    "pk": 59, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2006-01-01T06:00:00Z", 
+      "percentage": 6, 
+      "resolution": "Other"
+    }
+  }, 
+  {
+    "pk": 60, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2005-01-01T06:00:00Z", 
+      "percentage": 5, 
+      "resolution": "Other"
+    }
+  }, 
+  {
+    "pk": 61, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2004-01-01T06:00:00Z", 
+      "percentage": 5, 
+      "resolution": "Other"
+    }
+  }, 
+  {
+    "pk": 62, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2003-01-01T06:00:00Z", 
+      "percentage": 5, 
+      "resolution": "Other"
+    }
+  }, 
+  {
+    "pk": 63, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2002-01-01T06:00:00Z", 
+      "percentage": 5, 
+      "resolution": "Other"
+    }
+  }, 
+  {
+    "pk": 64, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2001-01-01T06:00:00Z", 
+      "percentage": 5, 
+      "resolution": "Other"
+    }
+  }, 
+  {
+    "pk": 65, 
+    "model": "app.resolutionbyyear", 
+    "fields": {
+      "date": "2000-05-20T05:00:00Z", 
+      "percentage": 4, 
+      "resolution": "Other"
+    }
+  }, 
+  {
+    "pk": 1, 
     "model": "app.population", 
     "fields": {
       "age": 0, 
