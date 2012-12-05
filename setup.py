@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from os.path import join, dirname
-from setuptools import setup
+from setuptools import setup, find_packages
 
 
 version = __import__('model_report').__version__
@@ -31,7 +31,7 @@ setup(name='django-model-report',
       license='BSD',
       keywords='django, model, report, reports, highcharts, chart, charts',
       url='https://github.com/juanpex/django-model-report',
-      packages=['model_report', ],
+      packages=find_packages(),
       package_data={'model_report': ['locale/*/LC_MESSAGES/*']},
       long_description=long_description(),
       install_requires=['django>=1.2.5', ],

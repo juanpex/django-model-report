@@ -17,6 +17,7 @@ from model_report.utils import base_label, ReportValue, ReportRow
 from model_report.highcharts import HighchartRender
 from model_report.widgets import RangeField
 from model_report.export_pdf import render_to_pdf
+from django.db.models.related import RelatedObject
 
 try:
     from collections import OrderedDict
@@ -110,6 +111,8 @@ class ReportAdmin(object):
     override_field_values = {}
     override_field_formats = {}
     override_field_labels = {}
+    override_field_choices = {}
+    override_field_filter_values = {}
     chart_types = ()
     exports = ('excel', 'pdf')
     inlines = []
@@ -135,8 +138,11 @@ class ReportAdmin(object):
                     for field_lookup in field.split("__"):
                         if not pre_field:
                             pre_field = base_model._meta.get_field_by_name(field_lookup)[0]
-                            if 'ManyToManyField' in unicode(pre_field):
+                            if 'ManyToManyField' in unicode(pre_field) or isinstance(pre_field, RelatedObject):
                                 m2mfields.append(pre_field)
+                        elif isinstance(pre_field, RelatedObject):
+                            base_model = pre_field.model
+                            pre_field = base_model._meta.get_field_by_name(field_lookup)[0]
                         else:
                             if 'Date' in unicode(pre_field):
                                 pre_field = pre_field
@@ -153,6 +159,7 @@ class ReportAdmin(object):
                         model_field = field
             except IndexError:
                 raise ValueError('The field "%s" does not exist in model "%s".' % (field, self.model._meta.module_name))
+
             model_fields.append([model_field, field])
             if m2mfields:
                 model_m2m_fields.append([model_field, field, len(model_fields) - 1, m2mfields])
@@ -511,22 +518,35 @@ class ReportAdmin(object):
                 if v is None:
                     pre_field = None
                     base_model = self.model
+
                     if '__' in k:
                         for field_lookup in k.split("__")[:-1]:
-                            if not pre_field:
-                                pre_field = base_model._meta.get_field_by_name(field_lookup)[0]
-                            else:
-                                base_model = pre_field.rel.to
-                                pre_field = base_model._meta.get_field_by_name(field_lookup)[0]
+                            if pre_field:
+                                if isinstance(pre_field, RelatedObject):
+                                    base_model = pre_field.model
+                                else:
+                                    base_model = pre_field.rel.to
+
+                            pre_field = base_model._meta.get_field_by_name(field_lookup)[0]
                         model_field = pre_field
                     else:
                         field_name = k.split("__")[0]
                         model_field = opts.get_field_by_name(field_name)[0]
+
                     if isinstance(model_field, (DateField, DateTimeField)):
                         form_fields.pop(k)
                         form_fields[k] = RangeField(model_field.formfield)
                     else:
-                        field = model_field.formfield()
+                        if not hasattr(model_field, 'formfield'):
+                            field = forms.ModelChoiceField(queryset=model_field.model.objects.all())
+                            field.label = self.override_field_labels.get(k, base_label)(self, field) if k in self.override_field_labels else field_lookup
+                        else:
+                            field = model_field.formfield()
+
+                        # Provide a hook for updating the queryset
+                        if k in self.override_field_choices:
+                            field.queryset = self.override_field_choices.get(k)(field.queryset)
+
                         field.label = force_unicode(_(field.label))
                         form_fields[k] = field
                 else:
@@ -639,6 +659,11 @@ class ReportAdmin(object):
             if callable(attr):
                 attr = attr()
             return attr
+
+        for kwarg, value in filter_kwargs.items():
+            if kwarg in self.override_field_filter_values:
+                filter_kwargs[kwarg] = self.override_field_filter_values.get(kwarg)(self, value)
+
         qs = self.get_query_set(filter_kwargs)
         ffields = [f if 'self.' not in f else 'pk' for f in self.get_query_field_names() if f not in filter_related_fields]
         extra_ffield = []
