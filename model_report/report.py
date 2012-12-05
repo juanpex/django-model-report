@@ -568,6 +568,12 @@ class ReportAdmin(object):
                         form_fields.pop(k)
                         form_fields[k] = RangeField(model_field.formfield)
 
+                    if hasattr(form_fields[k], 'choices'):
+                        if not hasattr(form_fields[k], 'queryset'):
+                            if form_fields[k].choices[0][0]:
+                                form_fields[k].choices.insert(0, (u'', '---------'))
+                                form_fields[k].initial = u''
+
         form_class = type('FilterFormBase', (forms.BaseForm,), {'base_fields': form_fields})
 
         class FilterForm(form_class):
@@ -626,11 +632,6 @@ class ReportAdmin(object):
 
                 for field in self.fields:
                     self.fields[field].required = False
-                    if hasattr(self.fields[field], 'choices'):
-                        if not hasattr(self.fields[field], 'queryset'):
-                            if self.fields[field].choices[0][0]:
-                                self.fields[field].choices.insert(0, ('', '---------'))
-                                self.fields[field].initial = ''
 
         form = FilterForm(data=request.GET or None)
         form.is_valid()
