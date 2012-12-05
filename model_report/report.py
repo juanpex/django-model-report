@@ -12,12 +12,14 @@ from django.utils.encoding import force_unicode
 from django.db.models import Q
 from django import forms
 from django.forms.models import fields_for_model
+from django.db.models.related import RelatedObject
+from django.conf import settings
 
 from model_report.utils import base_label, ReportValue, ReportRow
 from model_report.highcharts import HighchartRender
 from model_report.widgets import RangeField
 from model_report.export_pdf import render_to_pdf
-from django.db.models.related import RelatedObject
+
 
 try:
     from collections import OrderedDict
@@ -31,7 +33,6 @@ def autodiscover():
     not present. Borrowed form django.contrib.admin
     """
 
-    from django.conf import settings
     from django.utils.importlib import import_module
     from django.utils.module_loading import module_has_submodule
 
@@ -667,6 +668,7 @@ class ReportAdmin(object):
         qs = self.get_query_set(filter_kwargs)
         ffields = [f if 'self.' not in f else 'pk' for f in self.get_query_field_names() if f not in filter_related_fields]
         extra_ffield = []
+        backend = settings.DATABASES['default']['ENGINE'].split('.')[-1]
         for f in list(ffields):
             if '__' in f:
                 for field, name in self.model_fields:
@@ -676,11 +678,26 @@ class ReportAdmin(object):
                             if not flookup in ('year', 'month', 'day'):
                                 break
                             if flookup == 'year':
-                                extra_ffield.append([f, "strftime('%%Y', date)"])
+                                if 'sqlite' in backend:
+                                    extra_ffield.append([f, "strftime('%%Y', " + fname + ")"])
+                                elif 'postgres' in backend:
+                                    extra_ffield.append([f, "cast(extract(year from " + fname + ") as integer)"])
+                                else:
+                                    raise NotImplemented  # mysql
                             if flookup == 'month':
-                                extra_ffield.append([f, "strftime('%%m', date)"])
+                                if 'sqlite' in backend:
+                                    extra_ffield.append([f, "strftime('%%m', " + fname + ")"])
+                                elif 'postgres' in backend:
+                                    extra_ffield.append([f, "cast(extract(month from " + fname + ") as integer)"])
+                                else:
+                                    raise NotImplemented  # mysql
                             if flookup == 'day':
-                                extra_ffield.append([f, "strftime('%%d', date)"])
+                                if 'sqlite' in backend:
+                                    extra_ffield.append([f, "strftime('%%d', " + fname + ")"])
+                                elif 'postgres' in backend:
+                                    extra_ffield.append([f, "cast(extract(day from " + fname + ") as integer)"])
+                                else:
+                                    raise NotImplemented  # mysql
                         break
         obfields = list(self.list_order_by)
         if groupby_data and groupby_data['groupby']:

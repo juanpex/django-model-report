@@ -10,3 +10,4 @@ docs
 .project
 .pydevproject
 .settings/*
+resetdb.sh
