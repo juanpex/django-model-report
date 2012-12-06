@@ -539,7 +539,11 @@ class ReportAdmin(object):
                         form_fields.pop(k)
                         field = RangeField(model_field.formfield)
                     else:
-                        field = model_field.formfield()
+                        if not hasattr(model_field, 'formfield'):
+                            field = forms.ModelChoiceField(queryset=model_field.model.objects.all())
+                            field.label = self.override_field_labels.get(k, base_label)(self, field) if k in self.override_field_labels else field_lookup
+                        else:
+                            field = model_field.formfield()
                         field.label = force_unicode(_(field.label))
 
                 else:
