@@ -20,6 +20,7 @@ from model_report.utils import base_label, ReportValue, ReportRow
 from model_report.highcharts import HighchartRender
 from model_report.widgets import RangeField
 from model_report.export_pdf import render_to_pdf
+from django.utils.datetime_safe import datetime
 
 
 try:
@@ -115,6 +116,7 @@ class ReportAdmin(object):
     override_field_labels = {}
     override_field_choices = {}
     override_field_filter_values = {}
+    override_group_value = {}
     chart_types = ()
     exports = ('excel', 'pdf')
     inlines = []
@@ -813,7 +815,12 @@ class ReportAdmin(object):
             qs_list = group_m2m_field_values(qs_list)
 
         if groupby_data and groupby_data['groupby']:
-            g = groupby(qs_list, lambda x: x[ffields.index(groupby_data['groupby'])])
+            groupby_field = groupby_data['groupby']
+            if groupby_field in self.override_group_value:
+                transform_fn = self.override_group_value.get(groupby_field)
+                g = groupby(qs_list, lambda x: transform_fn(x[ffields.index(groupby_field)]))
+            else:
+                g = groupby(qs_list, lambda x: x[ffields.index(groupby_field)])
         else:
             g = groupby(qs_list, lambda x: None)
 
@@ -840,7 +847,6 @@ class ReportAdmin(object):
                     for index, column in enumerate(ffields):
                         value = get_field_value(resource, column)
                         if ffields[index] in self.group_totals:
-
                             row_group_totals[ffields[index]].append(value)
                         elif ffields[index] in self.report_totals:
                             row_report_totals[ffields[index]].append(value)
@@ -851,7 +857,6 @@ class ReportAdmin(object):
                         if column in self.override_field_formats:
                             value.format = self.override_field_formats[column]
                         row.append(value)
-
                 rows.append(row)
             if row_group_totals:
                 if groupby_data['groupby']:
@@ -862,6 +867,7 @@ class ReportAdmin(object):
                 for k, v in row_group_totals.items():
                     if k in row_report_totals:
                         row_report_totals[k].extend(v)
+
             if groupby_data and groupby_data['groupby']:
                 grouper = self._get_grouper_text(groupby_data['groupby'], grouper)
             else:
