@@ -118,6 +118,7 @@ class ReportAdmin(object):
     chart_types = ()
     exports = ('excel', 'pdf')
     inlines = []
+    query_set = None
 
     def __init__(self, parent_report=None, request=None):
         self.parent_report = parent_report
@@ -255,7 +256,8 @@ class ReportAdmin(object):
                     v = v.values_list('pk', flat=True)
                     k = '%s__pk__in' % k.split("__")[0]
                 qs = qs.filter(Q(**{k: v}))
-        return qs.distinct()
+        self.query_set = qs.distinct()
+        return self.query_set
 
     def get_title(self):
         title = self.title or None
