@@ -562,6 +562,12 @@ class ReportAdmin(object):
                     else:
                         field = v
 
+                    if hasattr(field, 'choices'):
+                        if not hasattr(field, 'queryset'):
+                            if field.choices[0][0]:
+                                field.choices.insert(0, ('', '---------'))
+                                field.initial = ''
+
                 # Provide a hook for updating the queryset
                 if hasattr(field, 'queryset') and k in self.override_field_choices:
                     field.queryset = self.override_field_choices.get(k)(field.queryset)
@@ -625,11 +631,6 @@ class ReportAdmin(object):
 
                 for field in self.fields:
                     self.fields[field].required = False
-                    if hasattr(self.fields[field], 'choices'):
-                        if not hasattr(self.fields[field], 'queryset'):
-                            if self.fields[field].choices[0][0]:
-                                self.fields[field].choices.insert(0, ('', '---------'))
-                                self.fields[field].initial = ''
 
         form = FilterForm(data=request.GET or None)
         form.is_valid()
