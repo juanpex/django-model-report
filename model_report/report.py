@@ -15,6 +15,7 @@ from django.forms.models import fields_for_model
 from django.db.models.related import RelatedObject
 from django.conf import settings
 
+
 from model_report.utils import base_label, ReportValue, ReportRow
 from model_report.highcharts import HighchartRender
 from model_report.widgets import RangeField
@@ -160,7 +161,6 @@ class ReportAdmin(object):
                         model_field = field
             except IndexError:
                 raise ValueError('The field "%s" does not exist in model "%s".' % (field, self.model._meta.module_name))
-
             model_fields.append([model_field, field])
             if m2mfields:
                 model_m2m_fields.append([model_field, field, len(model_fields) - 1, m2mfields])
@@ -519,7 +519,6 @@ class ReportAdmin(object):
                 if v is None:
                     pre_field = None
                     base_model = self.model
-
                     if '__' in k:
                         for field_lookup in k.split("__")[:-1]:
                             if pre_field:
@@ -527,8 +526,8 @@ class ReportAdmin(object):
                                     base_model = pre_field.model
                                 else:
                                     base_model = pre_field.rel.to
-
                             pre_field = base_model._meta.get_field_by_name(field_lookup)[0]
+
                         model_field = pre_field
                     else:
                         field_name = k.split("__")[0]
@@ -536,44 +535,35 @@ class ReportAdmin(object):
 
                     if isinstance(model_field, (DateField, DateTimeField)):
                         form_fields.pop(k)
-                        form_fields[k] = RangeField(model_field.formfield)
+                        field = RangeField(model_field.formfield)
                     else:
-                        if not hasattr(model_field, 'formfield'):
-                            field = forms.ModelChoiceField(queryset=model_field.model.objects.all())
-                            field.label = self.override_field_labels.get(k, base_label)(self, field) if k in self.override_field_labels else field_lookup
-                        else:
-                            field = model_field.formfield()
-
-                        # Provide a hook for updating the queryset
-                        if k in self.override_field_choices:
-                            field.queryset = self.override_field_choices.get(k)(field.queryset)
-
+                        field = model_field.formfield()
                         field.label = force_unicode(_(field.label))
-                        form_fields[k] = field
+
                 else:
                     if isinstance(v, (forms.BooleanField)):
                         form_fields.pop(k)
-                        form_fields[k] = forms.ChoiceField()
-                        form_fields[k].label = v.label
-                        form_fields[k].help_text = v.help_text
-                        form_fields[k].choices = (
+                        field = forms.ChoiceField()
+                        field.label = v.label
+                        field.help_text = v.help_text
+                        field.choices = (
                             ('', ''),
                             (True, _('Yes')),
                             (False, _('No')),
                         )
-                        setattr(form_fields[k], 'as_boolean', True)
+                        setattr(field, 'as_boolean', True)
                     elif isinstance(v, (forms.DateField, forms.DateTimeField)):
                         field_name = k.split("__")[0]
                         model_field = opts.get_field_by_name(field_name)[0]
                         form_fields.pop(k)
-                        form_fields[k] = RangeField(model_field.formfield)
+                        field = RangeField(model_field.formfield)
+                    else:
+                        field = v
 
-                    self.fields[field].required = False
-                    if hasattr(form_fields[k], 'choices'):
-                        if not hasattr(form_fields[k], 'queryset'):
-                            if form_fields[k].choices[0][0]:
-                                form_fields[k].choices.insert(0, (u'', '---------'))
-                                form_fields[k].initial = u''
+                # Provide a hook for updating the queryset
+                if hasattr(field, 'queryset') and k in self.override_field_choices:
+                    field.queryset = self.override_field_choices.get(k)(field.queryset)
+                form_fields[k] = field
 
         form_class = type('FilterFormBase', (forms.BaseForm,), {'base_fields': form_fields})
 
@@ -630,6 +620,14 @@ class ReportAdmin(object):
                                     field.queryset = qs.filter(Q(**{k: v}))
                 except:
                     pass
+
+                for field in self.fields:
+                    self.fields[field].required = False
+                    if hasattr(self.fields[field], 'choices'):
+                        if not hasattr(self.fields[field], 'queryset'):
+                            if self.fields[field].choices[0][0]:
+                                self.fields[field].choices.insert(0, ('', '---------'))
+                                self.fields[field].initial = ''
 
         form = FilterForm(data=request.GET or None)
         form.is_valid()
