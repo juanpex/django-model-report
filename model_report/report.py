@@ -21,6 +21,7 @@ from model_report.highcharts import HighchartRender
 from model_report.widgets import RangeField
 from model_report.export_pdf import render_to_pdf
 from django.utils.datetime_safe import datetime
+import time
 
 
 try:
@@ -797,6 +798,9 @@ class ReportAdmin(object):
             def get_key_values(gqs_vals):
                 return [v if index not in m2m_indexes else None for index, v in enumerate(gqs_vals)]
 
+            # gqs_values needs to already be sorted on the same key function
+            # for groupby to work properly
+            gqs_values = sorted(gqs_values, key=get_key_values)
             res = groupby(gqs_values, key=get_key_values)
             row_values = {}
             for key, values in res:
