@@ -167,6 +167,10 @@ def supports__name_label(report, field):
     return _("[Support] Name")
 
 
+def filter_supports__name(report, values):
+    return values.exclude(name__icontains='css')
+
+
 class BrowserListReport(ReportAdmin):
     title = _('Browser List')
     model = Browser
@@ -196,6 +200,12 @@ class BrowserListReport(ReportAdmin):
     }
     report_totals = {
         'supports__name': sum_column
+    }
+    override_field_filter_values = {
+        'supports__name': filter_supports__name
+    }
+    override_field_choices = {
+        'supports__name': filter_supports__name
     }
 
 

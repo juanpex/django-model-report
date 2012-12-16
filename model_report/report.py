@@ -570,6 +570,7 @@ class ReportAdmin(object):
                         field = v
 
                     if hasattr(field, 'choices'):
+                        # self.override_field_filter_values
                         if not hasattr(field, 'queryset'):
                             if field.choices[0][0]:
                                 field.choices.insert(0, ('', '---------'))
@@ -577,7 +578,7 @@ class ReportAdmin(object):
 
                 # Provide a hook for updating the queryset
                 if hasattr(field, 'queryset') and k in self.override_field_choices:
-                    field.queryset = self.override_field_choices.get(k)(field.queryset)
+                    field.queryset = self.override_field_choices.get(k)(self, field.queryset)
                 form_fields[k] = field
 
         form_class = type('FilterFormBase', (forms.BaseForm,), {'base_fields': form_fields})

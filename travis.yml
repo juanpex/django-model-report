@@ -1,0 +1,29 @@
+language: python
+
+python:
+    - "2.6"
+    - "2.7"
+
+env:
+    - DB=sqlite
+    - DB=postgresql
+    - DJANGO=1.3.1
+    - DJANGO=1.4
+
+install:
+    - pip install -q Django==$DJANGO --use-mirrors
+    - pip install -q pisa --use-mirrors
+    - pip install -q reportlab --use-mirrors
+    - pip install -q html5lib --use-mirrors
+    - pip install -q BeautifulSoup --use-mirrors
+    - pip install -q psycopg2==2.4.5 --use-mirrors
+
+script:
+    - cd example && python manage.py test app --settings=test_project.settings_$DB
+
+notifications:
+  email:
+    recipients:
+      - jpma55@gmail.com
+    on_success: always
+    on_failure: always
