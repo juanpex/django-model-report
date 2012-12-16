@@ -4,6 +4,8 @@ Django Model Report
 django reports integrated with highcharts
 
 
+[![Build Status](https://travis-ci.org/juanpex/django-model-report.png)](https://travis-ci.org/juanpex/django-model-report)
+
 Demo
 ====
 
