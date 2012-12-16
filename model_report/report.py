@@ -20,6 +20,8 @@ from model_report.utils import base_label, ReportValue, ReportRow
 from model_report.highcharts import HighchartRender
 from model_report.widgets import RangeField
 from model_report.export_pdf import render_to_pdf
+from django.utils.datetime_safe import datetime
+import time
 
 
 try:
@@ -115,6 +117,7 @@ class ReportAdmin(object):
     override_field_labels = {}
     override_field_choices = {}
     override_field_filter_values = {}
+    override_group_value = {}
     chart_types = ()
     exports = ('excel', 'pdf')
     inlines = []
@@ -539,7 +542,11 @@ class ReportAdmin(object):
                         form_fields.pop(k)
                         field = RangeField(model_field.formfield)
                     else:
-                        field = model_field.formfield()
+                        if not hasattr(model_field, 'formfield'):
+                            field = forms.ModelChoiceField(queryset=model_field.model.objects.all())
+                            field.label = self.override_field_labels.get(k, base_label)(self, field) if k in self.override_field_labels else field_lookup
+                        else:
+                            field = model_field.formfield()
                         field.label = force_unicode(_(field.label))
 
                 else:
@@ -561,6 +568,12 @@ class ReportAdmin(object):
                         field = RangeField(model_field.formfield)
                     else:
                         field = v
+
+                    if hasattr(field, 'choices'):
+                        if not hasattr(field, 'queryset'):
+                            if field.choices[0][0]:
+                                field.choices.insert(0, ('', '---------'))
+                                field.initial = ''
 
                 # Provide a hook for updating the queryset
                 if hasattr(field, 'queryset') and k in self.override_field_choices:
@@ -625,11 +638,6 @@ class ReportAdmin(object):
 
                 for field in self.fields:
                     self.fields[field].required = False
-                    if hasattr(self.fields[field], 'choices'):
-                        if not hasattr(self.fields[field], 'queryset'):
-                            if self.fields[field].choices[0][0]:
-                                self.fields[field].choices.insert(0, ('', '---------'))
-                                self.fields[field].initial = ''
 
         form = FilterForm(data=request.GET or None)
         form.is_valid()
@@ -790,6 +798,9 @@ class ReportAdmin(object):
             def get_key_values(gqs_vals):
                 return [v if index not in m2m_indexes else None for index, v in enumerate(gqs_vals)]
 
+            # gqs_values needs to already be sorted on the same key function
+            # for groupby to work properly
+            gqs_values = sorted(gqs_values, key=get_key_values)
             res = groupby(gqs_values, key=get_key_values)
             row_values = {}
             for key, values in res:
@@ -808,7 +819,12 @@ class ReportAdmin(object):
             qs_list = group_m2m_field_values(qs_list)
 
         if groupby_data and groupby_data['groupby']:
-            g = groupby(qs_list, lambda x: x[ffields.index(groupby_data['groupby'])])
+            groupby_field = groupby_data['groupby']
+            if groupby_field in self.override_group_value:
+                transform_fn = self.override_group_value.get(groupby_field)
+                g = groupby(qs_list, lambda x: transform_fn(x[ffields.index(groupby_field)]))
+            else:
+                g = groupby(qs_list, lambda x: x[ffields.index(groupby_field)])
         else:
             g = groupby(qs_list, lambda x: None)
 
@@ -835,7 +851,6 @@ class ReportAdmin(object):
                     for index, column in enumerate(ffields):
                         value = get_field_value(resource, column)
                         if ffields[index] in self.group_totals:
-
                             row_group_totals[ffields[index]].append(value)
                         elif ffields[index] in self.report_totals:
                             row_report_totals[ffields[index]].append(value)
@@ -846,7 +861,6 @@ class ReportAdmin(object):
                         if column in self.override_field_formats:
                             value.format = self.override_field_formats[column]
                         row.append(value)
-
                 rows.append(row)
             if row_group_totals:
                 if groupby_data['groupby']:
@@ -857,6 +871,7 @@ class ReportAdmin(object):
                 for k, v in row_group_totals.items():
                     if k in row_report_totals:
                         row_report_totals[k].extend(v)
+
             if groupby_data and groupby_data['groupby']:
                 grouper = self._get_grouper_text(groupby_data['groupby'], grouper)
             else:
