@@ -18,6 +18,9 @@ install:
     - pip install -q BeautifulSoup --use-mirrors
     - pip install -q psycopg2==2.4.5 --use-mirrors
 
+before_script:
+  - psql -c 'create database model_report;' -U postgres
+
 script:
     - cd example && python manage.py test app --settings=test_project.settings_$DB
 
