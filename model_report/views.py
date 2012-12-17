@@ -20,5 +20,6 @@ def report(request, slug):
     context = {
         'report_list': reports.get_reports()
     }
+    
     report = report_class(request=request)
     return report.render(request, extra_context=context)
