@@ -20,8 +20,6 @@ from model_report.utils import base_label, ReportValue, ReportRow
 from model_report.highcharts import HighchartRender
 from model_report.widgets import RangeField
 from model_report.export_pdf import render_to_pdf
-from django.utils.datetime_safe import datetime
-import time
 
 
 try:
