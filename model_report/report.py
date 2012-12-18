@@ -81,18 +81,16 @@ class ReportClassManager(object):
         return self._register.values()
 
 
-
 reports = ReportClassManager()
-
-
 
 
 _cache_class = {}
 
+
 def cache_return(fun):
-    """ 
+    """
     Usages of this decorator have been removed from the ReportAdmin base class.
-    
+
     Caching method returns gets in the way of customization at the implementation level
     now that report instances can be modified based on request data.
     """
@@ -586,7 +584,7 @@ class ReportAdmin(object):
 
                 # Provide a hook for updating the queryset
                 if hasattr(field, 'queryset') and k in self.override_field_choices:
-                    field.queryset = self.override_field_choices.get(k)(self, field.queryset)
+                    field.queryset = self.override_field_choices.get(k)(field.queryset)
                 form_fields[k] = field
 
         form_class = type('FilterFormBase', (forms.BaseForm,), {'base_fields': form_fields})
