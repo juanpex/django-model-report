@@ -807,7 +807,7 @@ class ReportAdmin(object):
 
             # gqs_values needs to already be sorted on the same key function
             # for groupby to work properly
-            gqs_values = sorted(gqs_values, key=get_key_values)
+            gqs_values.sort(key=get_key_values)
             res = groupby(gqs_values, key=get_key_values)
             row_values = {}
             for key, values in res:
@@ -836,7 +836,7 @@ class ReportAdmin(object):
         else:
             groupby_fn = lambda x: None
 
-        qs_list = sorted(qs_list, key=groupby_fn)
+        qs_list.sort(key=groupby_fn)
         g = groupby(qs_list, key=groupby_fn)
 
         row_report_totals = self.get_empty_row_asdict(self.report_totals, [])
