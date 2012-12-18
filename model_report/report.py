@@ -59,7 +59,7 @@ def autodiscover():
                 raise
 
 
-class ReportInstanceManager(object):
+class ReportClassManager(object):
 
     _register = OrderedDict()
 
@@ -69,24 +69,33 @@ class ReportInstanceManager(object):
     def register(self, slug, rclass):
         if slug in self._register:
             raise ValueError('Slug already exists: %s' % slug)
-        report = rclass()
-        setattr(report, 'slug', slug)
-        self._register[slug] = report
+        setattr(rclass, 'slug', slug)
+        self._register[slug] = rclass
 
     def get_report(self, slug):
+        # return class
         return self._register.get(slug, None)
 
     def get_reports(self):
+        # return clasess
         return self._register.values()
 
 
-reports = ReportInstanceManager()
+
+reports = ReportClassManager()
+
+
 
 
 _cache_class = {}
 
-
 def cache_return(fun):
+    """ 
+    Usages of this decorator have been removed from the ReportAdmin base class.
+    
+    Caching method returns gets in the way of customization at the implementation level
+    now that report instances can be modified based on request data.
+    """
     def wrap(self, *args, **kwargs):
         cache_field = '%s_%s' % (self.__class__.__name__, fun.func_name)
         if cache_field in _cache_class:
@@ -203,7 +212,7 @@ class ReportAdmin(object):
             pass
         return value
 
-    @cache_return
+    # @cache_return
     def get_m2m_field_names(self):
         return [field for ffield, field, index, mfield in self.model_m2m_fields]
 
@@ -238,7 +247,7 @@ class ReportAdmin(object):
             values.append(caption)
         return values
 
-    @cache_return
+    # @cache_return
     def get_query_field_names(self):
         values = []
         for field in self.get_fields():
@@ -248,7 +257,7 @@ class ReportAdmin(object):
                 values.append(field)
         return values
 
-    @cache_return
+    # @cache_return
     def get_query_set(self, filter_kwargs):
         qs = self.model.objects.all()
         for k, v in filter_kwargs.items():
@@ -389,6 +398,7 @@ class ReportAdmin(object):
             return context
         finally:
             globals()['_cache_class'] = {}
+            
 
     def render(self, request, extra_context={}):
         context_or_response = self.get_render_context(request, extra_context)
@@ -463,15 +473,15 @@ class ReportAdmin(object):
 
         return form
 
-    @cache_return
+    # @cache_return
     def get_groupby_fields(self):
         return [(mfield, field, caption) for (mfield, field), caption in zip(self.model_fields, self.get_column_names()) if field in self.list_group_by]
 
-    @cache_return
+    # @cache_return
     def get_serie_fields(self):
         return [(index, mfield, field, caption) for index, ((mfield, field), caption) in enumerate(zip(self.model_fields, self.get_column_names())) if field in self.list_serie_fields]
 
-    @cache_return
+    # @cache_return
     def get_form_groupby(self, request):
         groupby_fields = self.get_groupby_fields()
 
