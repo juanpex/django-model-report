@@ -825,15 +825,19 @@ class ReportAdmin(object):
         if self.model_m2m_fields:
             qs_list = group_m2m_field_values(qs_list)
 
+        groupby_fn = None
         if groupby_data and groupby_data['groupby']:
             groupby_field = groupby_data['groupby']
             if groupby_field in self.override_group_value:
                 transform_fn = self.override_group_value.get(groupby_field)
-                g = groupby(qs_list, lambda x: transform_fn(x[ffields.index(groupby_field)]))
+                groupby_fn = lambda x: transform_fn(x[ffields.index(groupby_field)])
             else:
-                g = groupby(qs_list, lambda x: x[ffields.index(groupby_field)])
+                groupby_fn = lambda x: x[ffields.index(groupby_field)]
         else:
-            g = groupby(qs_list, lambda x: None)
+            groupby_fn = lambda x: None
+
+        qs_list = sorted(qs_list, key=groupby_fn)
+        g = groupby(qs_list, key=groupby_fn)
 
         row_report_totals = self.get_empty_row_asdict(self.report_totals, [])
         for grouper, resources in g:
