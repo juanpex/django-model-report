@@ -6,13 +6,15 @@ from django.utils.encoding import force_unicode
 
 
 class RangeWidget(forms.MultiWidget):
+    """
+    Render 2 inputs with vDatepicker class in order to select a date range.
+    """
     def __init__(self, widget, *args, **kwargs):
         widgets = (widget, widget)
         kwargs['attrs'] = {'class': 'vDatepicker'}
         super(RangeWidget, self).__init__(widgets=widgets, *args, **kwargs)
 
     def decompress(self, value):
-        raise value
         return value
 
     def format_output(self, rendered_widgets):
@@ -21,6 +23,9 @@ class RangeWidget(forms.MultiWidget):
 
 
 class RangeField(forms.MultiValueField):
+    """
+    Field to filter date values by range.
+    """
     default_error_messages = {
         'invalid_start': _(u'Enter a valid start value.'),
         'invalid_end': _(u'Enter a valid end value.'),

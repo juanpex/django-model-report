@@ -17,13 +17,17 @@ import cgi
 
 
 def HTMLEntitiesToUnicode(text):
-    """Converts HTML entities to unicode.  For example '&amp;' becomes '&'."""
+    """
+    Converts HTML entities to unicode.  For example '&amp;' becomes '&'.
+    """
     text = unicode(BeautifulStoneSoup(text, convertEntities=BeautifulStoneSoup.ALL_ENTITIES))
     return text
 
 
 def unicodeToHTMLEntities(text):
-    """Converts unicode to HTML entities.  For example '&' becomes '&amp;'."""
+    """
+    Converts unicode to HTML entities.  For example '&' becomes '&amp;'.
+    """
     if text is None:
         text = force_unicode(_('None'))
     text = cgi.escape(text).encode('ascii', 'xmlcharrefreplace')

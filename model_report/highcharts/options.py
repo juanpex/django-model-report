@@ -3,6 +3,9 @@ from model_report.highcharts.base import true, false, null, Solid, outside, unde
 
 
 def get_highchart_data():
+    """
+    Function helper that returns a basic all default values of highcharts javascript options.
+    """
 
     ChartData = {
         'alignTicks': true,

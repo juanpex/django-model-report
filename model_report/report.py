@@ -62,6 +62,9 @@ def autodiscover():
 
 
 class ReportInstanceManager(object):
+    """
+    Class to handle registered reports.
+    """
 
     _register = OrderedDict()
 
@@ -100,28 +103,80 @@ def cache_return(fun):
 
 
 class ReportAdmin(object):
+    """
+    Class to represent a Report.
+    """
 
     fields = []
+    """List of fields or lookup fields for query results to be listed."""
+
     model = None
+    """Primary django model to query."""
+
     list_filter = ()
+    """List of fields or lookup fields to filter data."""
+
     list_order_by = ()
+    """List of fields or lookup fields to order data."""
+
     list_group_by = ()
+    """List of fields or lookup fields to group data."""
+
     list_serie_fields = ()
+    """List of fields to group by results in chart."""
+
     template_name = None
+    """Template file name to render the report."""
+
     title = None
+    """Title of the report."""
+
     type = 'report'
+    """"report" for only report and  "chart" for report and chart graphic results."""
+
     group_totals = {}
+    """Dictionary with field name as key and function to calculate their values."""
+
     report_totals = {}
+    """Dictionary with field name as key and function to calculate their values."""
+
     override_field_values = {}
+    """
+    Dictionary with field name as key and function to parse their original values.
+
+    ::
+
+        override_field_values = {
+            'men': men_format,
+            'women': women_format
+        }
+    """
     override_field_formats = {}
+    """Dictionary with field name as key and function to parse their value after :func:`override_field_values`."""
+
     override_field_labels = {}
+    """Dictionary with field name as key and function to parse the column label."""
+
     override_field_choices = {}
+    """#TODO"""
+
     override_field_filter_values = {}
+    """#TODO"""
+
     override_group_value = {}
+    """#TODO"""
+
     chart_types = ()
+    """List of highchart types."""
+
     exports = ('excel', 'pdf')
+    """Alternative render report as "pdf" or "csv"."""
+
     inlines = []
+    """List of other's Report related to the main report."""
+
     query_set = None
+    """#TODO"""
 
     def __init__(self, parent_report=None, request=None):
         self.parent_report = parent_report
@@ -232,6 +287,9 @@ class ReportAdmin(object):
         return [x for x in self.fields if not x in self.related_fields]
 
     def get_column_names(self, ignore_columns={}):
+        """
+        Return the list of columns
+        """
         values = []
         for field, field_name in self.model_fields:
             if field_name in ignore_columns:
@@ -252,6 +310,9 @@ class ReportAdmin(object):
 
     @cache_return
     def get_query_set(self, filter_kwargs):
+        """
+        Return the the queryset
+        """
         qs = self.model.objects.all()
         for k, v in filter_kwargs.items():
             if not v is None and v != '':
@@ -263,6 +324,9 @@ class ReportAdmin(object):
         return self.query_set
 
     def get_title(self):
+        """
+        Return the report title
+        """
         title = self.title or None
         if not title:
             if not self.model:

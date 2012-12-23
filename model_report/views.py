@@ -7,6 +7,7 @@ from model_report.report import reports
 
 
 def report_list(request):
+    """This view render all reports registered"""
     context = {
         'report_list': reports.get_reports()
     }
@@ -14,6 +15,12 @@ def report_list(request):
 
 
 def report(request, slug):
+    """
+        This view render one report
+
+        Keywords arguments:
+        slug -- slug of the report
+    """
     report = reports.get_report(slug)
     if not report:
         raise Http404

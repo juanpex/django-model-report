@@ -8,6 +8,15 @@ from cgi import escape
 
 
 def render_to_pdf(report, template_src, context_dict, pdf_encoding='UTF-8'):
+    """
+        Render the report results to pdf format.
+
+        Keyword arguments:
+        report -- a report instance
+        template_src -- template file path
+        context_dict -- context dictionary
+        pdf_encoding -- encoding to render string
+    """
     template = get_template(template_src)
     context = Context(context_dict)
     html = template.render(context)

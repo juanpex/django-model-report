@@ -5,6 +5,9 @@ from django.utils.encoding import force_unicode
 
 
 def base_label(report, field):
+    """
+    Basic label
+    """
     if hasattr(field, 'verbose_name'):
         return "%s" % field.verbose_name.title()
     return field
@@ -15,6 +18,9 @@ model_lookup_label = lambda report, field: "[%s] %s" % (report.model._meta.verbo
 
 
 def sum_column(values):
+    """
+    Sum values for any column
+    """
     if not values:
         return Decimal(0.00)
     if isinstance(values[0], (list, tuple)):
@@ -24,6 +30,9 @@ sum_column.caption = _('Total')
 
 
 def avg_column(values):
+    """
+    Average values for any column
+    """
     if not values:
         return Decimal(0.00)
     return Decimal(float(sum_column(values)) / float(len(values)))
@@ -31,27 +40,52 @@ avg_column.caption = _('Average')
 
 
 def count_column(values):
+    """
+    Count values for any column
+    """
     return Decimal(len(values))
 count_column.caption = _('Count')
 
 
 def date_format(value, instance):
+    """
+    Format cell value to friendly date string
+    """
     return value.strftime("%d/%m/%Y")
 
 
 def usd_format(value, instance):
+    """
+    Format cell value to money
+    """
     return 'USD %.2f' % Decimal(value)
 
 
 def yesno_format(value, instance):
+    """
+    Format boolean value to render Yes or No if True or False
+    """
     return _('Yes') if value else _('No')
 
 
 def round_format(value, instance):
+    """
+    Format value to render with 2 decimal places
+    """
     return Decimal('%.2f' % Decimal(value))
 
 
 class ReportValue(object):
+    """
+    Class to represent cells values for report rows
+
+    Attributes:
+
+    * ``value`` - real value from database
+    * ``is_report_total`` - defined as True if value is for showing in report total row
+    * ``is_group_total`` - defined as True if value is for showing in group total row
+    * ``is_value`` - defined as True if value is for showing in normal row
+    """
     value = None
     is_report_total = False
     is_group_total = False
@@ -61,9 +95,15 @@ class ReportValue(object):
         self.value = value
 
     def format(self, value, instance):
+        """
+        Format the value instance.
+        """
         return value
 
     def text(self):
+        """
+        Render as text the value. This function also format the value.
+        """
         return force_unicode(self.format(self.value, instance=self))
 
     def __repr__(self):
@@ -80,10 +120,21 @@ class ReportValue(object):
 
 
 class ReportRow(list):
+    """
+    Class to represent report rows
+
+    Attributes:
+
+    * ``is_total`` - defined as True if row is a group total row or report total row
+    * ``is_caption`` - TODO
+    """
     is_total = False
     is_caption = False
 
     def get_css_class(self):
+        """
+        Render css classes to this row into html representation
+        """
         classes = []
         if self.is_total:
             classes.append('total')
@@ -92,4 +143,7 @@ class ReportRow(list):
         return " ".join(classes)
 
     def is_value(self):
+        """
+        Evaluate True if the row is a normal row or not
+        """
         return self.is_total == False and self.is_caption == False
