@@ -30,6 +30,26 @@
         background: #333 !important;
         color: #EEE !important;
       }
+      .utils {
+        
+        sheight: 70px;
+        text-align: left;
+      }
+      .utils p {
+          margin: 0;
+          padding: 0;
+      }
+      .readthedocs {
+        background: url("https://media.readthedocs.org/images/logo.png") no-repeat scroll left top transparent;
+        background-color: #404750;
+      }
+      .travis {
+        margin-top: 50px;
+        text-align: right;
+      }
+      .travis img {
+        margin:10px;
+      }
       #forkme {position: fixed; top: 0; right: 0; z-index: 10000;}
     </style>
     <link href="http://twitter.github.com/bootstrap/assets/css/bootstrap-responsive.css" rel="stylesheet">
@@ -56,7 +76,18 @@
           <div class="well sidebar-nav">
 
             <ul class="nav nav-list">
-              <li><img src="https://travis-ci.org/juanpex/django-model-report.png" /></li>
+              <li class="utils">
+                <p class="readthedocs">
+                  <a href="https://django-model-report.readthedocs.org/en/latest/" target="_blank">
+                    <img src="https://media.readthedocs.org/images/logo.png">
+                  </a>
+                </p>
+                <p class="travis">
+                  <a href="https://travis-ci.org/juanpex/django-model-report" target="_blank">
+                    <img src="https://travis-ci.org/juanpex/django-model-report.png" />
+                  </a>
+                </p>
+              </li>
               <li class="nav-header">{% trans "Report list" %}</li>
               {% block sidebar %}
               {% endblock %}
