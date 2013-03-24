@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import copy
-import csv
+from xlwt import Workbook, easyxf
 from itertools import groupby
 
 from django.http import HttpResponse
@@ -20,6 +20,45 @@ from model_report.utils import base_label, ReportValue, ReportRow
 from model_report.highcharts import HighchartRender
 from model_report.widgets import RangeField
 from model_report.export_pdf import render_to_pdf
+
+
+import arial10
+
+
+class FitSheetWrapper(object):
+    """Try to fit columns to max size of any entry.
+    To use, wrap this around a worksheet returned from the
+    workbook's add_sheet method, like follows:
+
+        sheet = FitSheetWrapper(book.add_sheet(sheet_name))
+
+    The worksheet interface remains the same: this is a drop-in wrapper
+    for auto-sizing columns.
+    """
+    def __init__(self, sheet):
+        self.sheet = sheet
+        self.widths = dict()
+        self.heights = dict()
+
+    def write(self, r, c, label='', *args, **kwargs):
+        self.sheet.write(r, c, label, *args, **kwargs)
+        self.sheet.row(r).collapse = True
+        bold = False
+        if args:
+            style = args[0]
+            bold = str(style.font.bold) in ('1', 'true', 'True')
+        width = arial10.fitwidth(label, bold)
+        if width > self.widths.get(c, 0):
+            self.widths[c] = width
+            self.sheet.col(c).width = width
+
+        height = arial10.fitheight(label, bold)
+        if height > self.heights.get(r, 0):
+            self.heights[r] = height
+            self.sheet.row(r).height = height
+
+    def __getattr__(self, attr):
+        return getattr(self.sheet, attr)
 
 
 try:
@@ -403,23 +442,44 @@ class ReportAdmin(object):
 
                 if not context_request.GET.get('export', None) is None and not self.parent_report:
                     if context_request.GET.get('export') == 'excel':
-                        response = HttpResponse(mimetype='text/csv')
-                        response['Content-Disposition'] = 'attachment; filename=%s.csv' % self.slug
-
-                        writer = csv.writer(response)
-
-                        writer.writerow([unicode(x).encode("utf-8") for x in column_labels])
+                        book = Workbook(encoding='utf-8')
+                        sheet1 = FitSheetWrapper(book.add_sheet(self.get_title()[:20]))
+                        stylebold = easyxf('font: bold true; alignment:')
+                        stylevalue = easyxf('alignment: horizontal left, vertical top;')
+                        row_index = 0
+                        for index, x in enumerate(column_labels):
+                            sheet1.write(row_index, index, unicode(x), stylebold)
+                        row_index += 1
 
                         for g, rows in report_rows:
+                            if g:
+                                sheet1.write(row_index, 0, unicode(g), stylebold)
+                                row_index += 1
                             for row in list(rows):
                                 if row.is_value():
-                                    writer.writerow([unicode(x.value).encode("utf-8") for x in row])
+                                    for index, x in enumerate(row):
+                                        if isinstance(x.value, (list, tuple)):
+                                            xvalue = ''.join(['%s\n' % v for v in x.value])
+                                        else:
+                                            xvalue = x.text()
+                                        sheet1.write(row_index, index, xvalue, stylevalue)
+                                    row_index += 1
                                 elif row.is_caption:
-                                    writer.writerow([unicode(x).encode("utf-8") for x in row])
+                                    for index, x in enumerate(row):
+                                        if not isinstance(x, unicode):
+                                            sheet1.write(row_index, index, x.text(), stylebold)
+                                        else:
+                                            sheet1.write(row_index, index, x, stylebold)
+                                    row_index += 1
                                 elif row.is_total:
-                                    writer.writerow([unicode(x.value).encode("utf-8") for x in row])
-                                    writer.writerow([unicode(' ').encode("utf-8") for x in row])
+                                    for index, x in enumerate(row):
+                                        sheet1.write(row_index, index, x.text(), stylebold)
+                                        sheet1.write(row_index + 1, index, ' ')
+                                    row_index += 2
 
+                        response = HttpResponse(mimetype="application/ms-excel")
+                        response['Content-Disposition'] = 'attachment; filename=%s.xls' % self.slug
+                        book.save(response)
                         return response
                     if context_request.GET.get('export') == 'pdf':
                         inlines = [ir(self, context_request) for ir in self.inlines]
@@ -460,7 +520,6 @@ class ReportAdmin(object):
             return context
         finally:
             globals()['_cache_class'] = {}
-            
 
     def render(self, request, extra_context={}):
         context_or_response = self.get_render_context(request, extra_context)
