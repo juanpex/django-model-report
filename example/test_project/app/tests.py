@@ -31,3 +31,23 @@ class ExampleCaseBasic(unittest.TestCase):
             report_rows = response.context['report_rows']
             if not report_rows:
                 raise ValueError('Empty report_rows for "%s"' % report.slug)
+
+
+class ExampleCaseExcel(unittest.TestCase):
+    fixtures = ['app', ]
+
+    def test_basic_query(self):
+        c = Client()
+        response = c.post('/')
+        self.assertEqual(response.status_code, 200)
+        report_list = response.context['report_list']
+        for report in report_list:
+            response = c.get("/%s/" % report.slug)
+            self.assertEqual(response.status_code, 200)
+            report_rows = response.context['report_rows']
+            if report_rows:
+                raise ValueError('Not empty report_rows for "%s"' % report.slug)
+            response = c.get(BASIC_GET_FOR_REPORT[report.slug] + '&export=excel')
+            self.assertEqual(response.status_code, 200)
+            self.assertTrue(response.has_header('content-type'))
+            self.assertEqual(response['content-type'], 'application/ms-excel')
