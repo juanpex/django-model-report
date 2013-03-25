@@ -146,9 +146,9 @@ def colwidth(n):
 def fitwidth(data, bold=False):
     '''Try to autofit Arial 10'''
     maxunits = 0
-    for ndata in unicode(data).split("\n"):
+    for ndata in data.split("\n"):
         units = 220
-        for char in unicode(ndata):
+        for char in ndata:
             if char in charwidths:
                 units += charwidths[char]
             else:
@@ -162,7 +162,7 @@ def fitwidth(data, bold=False):
 
 def fitheight(data, bold=False):
     '''Try to autofit Arial 10'''
-    rowlen = len(unicode(data).split("\n"))
+    rowlen = len(data.split("\n"))
     if rowlen > 1:
         units = 230 * rowlen
     else:
