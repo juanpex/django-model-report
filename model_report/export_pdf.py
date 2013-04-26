@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 import cStringIO as StringIO
-import ho.pisa as pisa
 from django.template.loader import get_template
 from django.template import Context
 from django.http import HttpResponse
@@ -22,6 +21,7 @@ def render_to_pdf(report, template_src, context_dict, pdf_encoding='UTF-8'):
     html = template.render(context)
     result = StringIO.StringIO()
 
+    import ho.pisa as pisa
     pdf = pisa.pisaDocument(StringIO.StringIO(html.encode(pdf_encoding)), result)
     if not pdf.err:
         response = HttpResponse(result.getvalue(), mimetype='application/pdf')
