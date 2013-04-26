@@ -3,17 +3,17 @@ language: python
 python:
     - "2.6"
     - "2.7"
-
 env:
     - DB=sqlite DJANGO=1.3.7
     - DB=sqlite DJANGO=1.4.5
-    - DB=sqlite DJANGO=1.5
+    - DB=sqlite DJANGO=1.5.1
     - DB=postgresql DJANGO=1.3.7
     - DB=postgresql DJANGO=1.4.5
-    - DB=postgresql DJANGO=1.5
+    - DB=postgresql DJANGO=1.5.1
 
 install:
-    - pip install -q Django==$DJANGO pisa reportlab html5lib BeautifulSoup psycopg2==2.4.1 xlwt==0.7.4 --use-mirrors
+    - pip install -q Django==$DJANGO --use-mirrors
+    - pip install -q -e .[pdf,xls,$DB]
 
 before_script:
   - psql -c 'create database model_report;' -U postgres
