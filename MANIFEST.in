@@ -1,0 +1,4 @@
+recursive-include model_report/templates *
+recursive-include model_report/static *
+recursive-include model_report/locale *
+include README.md
