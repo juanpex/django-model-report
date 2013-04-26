@@ -811,7 +811,8 @@ class ReportAdmin(object):
                 for field, name in self.model_fields:
                     if name == f:
                         if 'fields.Date' in unicode(field):
-                            fname, flookup = f.split('__')
+                            fname, flookup = f.rsplit('__', 1)
+                            fname = fname.split('__')[-1]
                             if not flookup in ('year', 'month', 'day'):
                                 break
                             if flookup == 'year':
@@ -819,6 +820,8 @@ class ReportAdmin(object):
                                     extra_ffield.append([f, "strftime('%%Y', " + fname + ")"])
                                 elif 'postgres' in backend:
                                     extra_ffield.append([f, "cast(extract(year from " + fname + ") as integer)"])
+                                elif 'mysql' in backend:
+                                    extra_ffield.append([f, "YEAR(" + fname + ")"])
                                 else:
                                     raise NotImplemented  # mysql
                             if flookup == 'month':
@@ -826,6 +829,8 @@ class ReportAdmin(object):
                                     extra_ffield.append([f, "strftime('%%m', " + fname + ")"])
                                 elif 'postgres' in backend:
                                     extra_ffield.append([f, "cast(extract(month from " + fname + ") as integer)"])
+                                elif 'mysql' in backend:
+                                    extra_ffield.append([f, "MONTH(" + fname + ")"])
                                 else:
                                     raise NotImplemented  # mysql
                             if flookup == 'day':
@@ -833,6 +838,8 @@ class ReportAdmin(object):
                                     extra_ffield.append([f, "strftime('%%d', " + fname + ")"])
                                 elif 'postgres' in backend:
                                     extra_ffield.append([f, "cast(extract(day from " + fname + ") as integer)"])
+                                elif 'mysql' in backend:
+                                    extra_ffield.append([f, "DAY(" + fname + ")"])
                                 else:
                                     raise NotImplemented  # mysql
                         break
