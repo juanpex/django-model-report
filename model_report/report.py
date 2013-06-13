@@ -230,10 +230,6 @@ class ReportAdmin(object):
         self.related_inline_field = None
         self.related_inline_accessor = None
         self.related_fields = []
-        if parent_report:
-            self.related_inline_field = [f for f, x in self.model._meta.get_fields_with_model() if f.rel and hasattr(f.rel, 'to') and f.rel.to is self.parent_report.model][0]
-            self.related_inline_accessor = self.related_inline_field.related.get_accessor_name()
-            self.related_fields = ["%s__%s" % (pfield.model._meta.module_name, attname) for pfield, attname in self.parent_report.model_fields if pfield.model == self.related_inline_field.rel.to]
         for field in self.get_query_field_names():
             try:
                 m2mfields = []
@@ -269,6 +265,21 @@ class ReportAdmin(object):
                 model_m2m_fields.append([model_field, field, len(model_fields) - 1, m2mfields])
         self.model_fields = model_fields
         self.model_m2m_fields = model_m2m_fields
+        if parent_report:
+            self.related_inline_field = [f for f, x in self.model._meta.get_fields_with_model() if f.rel and hasattr(f.rel, 'to') and f.rel.to is self.parent_report.model][0]
+            self.related_inline_accessor = self.related_inline_field.related.get_accessor_name()
+            self.related_fields = ["%s__%s" % (pfield.model._meta.module_name, attname) for pfield, attname in self.parent_report.model_fields if not isinstance(pfield, (str, unicode)) and  pfield.model == self.related_inline_field.rel.to]
+            self.related_inline_filters = []
+
+            for pfield, pattname in self.parent_report.model_fields:
+                for cfield, cattname in self.model_fields:
+                    try:
+                        if pattname in cattname:
+                            if pfield.model == cfield.model:
+                                self.related_inline_filters.append([pattname, cattname, self.parent_report.get_fields().index(pattname)])
+                    except Exception, e:
+                        pass
+
 
     def _get_grouper_text(self, groupby_field, value):
         try:
@@ -384,12 +395,8 @@ class ReportAdmin(object):
         related_fields = []
         filter_related_fields = {}
         if self.parent_report and by_row:
-
-            for index, (pfield, plookup) in enumerate(self.parent_report.model_fields):
-                for cfield, clookup in self.model_fields:
-                    if pfield is cfield and plookup in clookup:
-                        related_fields.append([pfield, cfield, plookup, clookup, by_row[index].value])
-                        filter_related_fields[clookup] = by_row[index].value
+            for mfield, cfield, index in self.related_inline_filters:
+                filter_related_fields[cfield] = by_row[index].value
 
         try:
             form_groupby = self.get_form_groupby(context_request)
