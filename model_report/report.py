@@ -47,12 +47,12 @@ class FitSheetWrapper(object):
         if args:
             style = args[0]
             bold = str(style.font.bold) in ('1', 'true', 'True')
-        width = arial10.fitwidth(label, bold)
+        width = int(arial10.fitwidth(label, bold))
         if width > self.widths.get(c, 0):
             self.widths[c] = width
             self.sheet.col(c).width = width
 
-        height = arial10.fitheight(label, bold)
+        height = int(arial10.fitheight(label, bold))
         if height > self.heights.get(r, 0):
             self.heights[r] = height
             self.sheet.row(r).height = height
