@@ -1,4 +1,4 @@
-django>=1.3
+-e git://github.com/django/django.git#egg=Django
 pisa
 reportlab
 html5lib
