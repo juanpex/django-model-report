@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>{% block title %}{% endblock %}</title>
-    <link href="http://twitter.github.com/bootstrap/assets/css/bootstrap.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style type="text/css">
       body {
         padding-top: 60px;
@@ -31,7 +31,7 @@
         color: #EEE !important;
       }
       .utils {
-        
+
         sheight: 70px;
         text-align: left;
       }
@@ -44,15 +44,23 @@
         background-color: #404750;
       }
       .travis {
-        margin-top: 50px;
         text-align: right;
       }
-      .travis img {
-        margin:10px;
-      }
       #forkme {position: fixed; top: 0; right: 0; z-index: 10000;}
+
+.nav > li > a {
+    padding-bottom: 0;
+  }
     </style>
-    <link href="http://twitter.github.com/bootstrap/assets/css/bootstrap-responsive.css" rel="stylesheet">
+        <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-theme.min.css">
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+
     <!--[if lt IE 9]>
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
@@ -62,39 +70,51 @@
 <body class="{% block body_class %}{% endblock %}">
     <div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
-        <div class="container-fluid">
+        <div class="container">
           <a class="brand" href="/">django-model-report</a>
 
         </div>
       </div>
     </div>
 
-<div class="container-fluid">
-    {% block container %}
-    <div class="row-fluid">
-        <div class="span3">
-          <div class="well sidebar-nav">
+    <div class="navbar navbar-fixed-top navbar-inverse" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">django-model-report</a>
+        </div>
+      </div><!-- /.container -->
+    </div><!-- /.navbar -->
 
-            <ul class="nav nav-list">
-              <li class="utils">
-                <p class="readthedocs">
+<div class="container">
+    {% block container %}
+    <div class="row">
+
+        <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar" role="navigation">
+          <div class="well sidebar-nav">
+            <ul class="nav">
+              <li><p class="readthedocs">
                   <a href="https://django-model-report.readthedocs.org/en/latest/" target="_blank">
                     <img src="https://media.readthedocs.org/images/logo.png">
                   </a>
-                </p>
-                <p class="travis">
+                </p></li>
+              <li><p class="travis">
                   <a href="https://travis-ci.org/juanpex/django-model-report" target="_blank">
                     <img src="https://travis-ci.org/juanpex/django-model-report.png" />
                   </a>
-                </p>
-              </li>
+                </p></li>
+
               <li class="nav-header">{% trans "Report list" %}</li>
               {% block sidebar %}
               {% endblock %}
             </ul>
-          </div>
+          </div><!--/.well -->
         </div>
-        <div class="span9">
+        <div class="col-xs-9">
         {% block content %}
         {% endblock %}
         </div>
