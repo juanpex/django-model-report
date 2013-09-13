@@ -1,4 +1,4 @@
-django>=1.4
+django==1.4
 pisa
 reportlab
 html5lib
