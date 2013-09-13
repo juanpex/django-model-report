@@ -18,7 +18,8 @@ before_script:
   - psql -c 'create database model_report;' -U postgres
 
 script:
-    - cd example && python manage.py test app --settings=test_project.settings_$DB --noinput
+    - cd example
+    - python manage.py test app --settings=test_project.settings_$DB --noinput
 
 notifications:
   email:
