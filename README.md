@@ -22,3 +22,7 @@ Contribute
 ==========
 
 Clone the repo and help to be better this app :)
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/juanpex/django-model-report/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
