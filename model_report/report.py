@@ -473,7 +473,7 @@ class ReportAdmin(object):
                                     row_index += 1
                                 elif row.is_caption:
                                     for index, x in enumerate(row):
-                                        if not isinstance(x, unicode):
+                                        if not isinstance(x, (unicode, str)):
                                             sheet1.write(row_index, index, x.text(), stylebold)
                                         else:
                                             sheet1.write(row_index, index, x, stylebold)
