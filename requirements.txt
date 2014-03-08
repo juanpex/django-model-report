@@ -1,8 +1,9 @@
 django==1.4
-pisa
 reportlab
 html5lib
 BeautifulSoup
 psycopg2==2.4.5
 dj-database-url==0.2.0
 xlwt==0.7.4
+xhtml2pdf
+
