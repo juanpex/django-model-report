@@ -13,6 +13,7 @@ from django.db.models import Q
 from django import forms
 from django.forms.models import fields_for_model
 from django.db.models.related import RelatedObject
+from django.db.models import ForeignKey
 from django.conf import settings
 
 
@@ -159,6 +160,9 @@ class ReportAdmin(object):
 
     list_filter = ()
     """List of fields or lookup fields to filter data."""
+
+    list_filter_queryset = {}
+    """ForeignKey custom queryset"""
 
     list_order_by = ()
     """List of fields or lookup fields to order data."""
@@ -681,6 +685,16 @@ class ReportAdmin(object):
                         if not hasattr(model_field, 'formfield'):
                             field = forms.ModelChoiceField(queryset=model_field.model.objects.all())
                             field.label = self.override_field_labels.get(k, base_label)(self, field) if k in self.override_field_labels else field_lookup
+
+                        elif isinstance(model_field, ForeignKey):
+                            field = model_field.formfield()
+
+                            if self.list_filter_queryset:
+                                for query_field, query in self.list_filter_queryset.iteritems():
+                                    if query_field == k:
+                                        for variable, value in query.iteritems():
+                                            field.queryset = field.queryset.filter(**{variable: value})
+                                            
                         else:
                             field = model_field.formfield()
                         field.label = force_unicode(_(field.label))
