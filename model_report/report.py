@@ -15,8 +15,8 @@ from django.forms.models import fields_for_model
 from django.db.models.related import RelatedObject
 from django.db.models import ForeignKey
 from django.conf import settings
-
-
+from django.forms import MultipleChoiceField
+from django.forms.widgets import SelectMultiple
 from model_report.utils import base_label, ReportValue, ReportRow
 from model_report.highcharts import HighchartRender
 from model_report.widgets import RangeField
@@ -160,7 +160,10 @@ class ReportAdmin(object):
 
     list_filter = ()
     """List of fields or lookup fields to filter data."""
-
+    
+    list_filter_widget = {}
+    """Widget for list filter field"""
+    
     list_filter_queryset = {}
     """ForeignKey custom queryset"""
 
@@ -378,6 +381,8 @@ class ReportAdmin(object):
                 if hasattr(v, 'values_list'):
                     v = v.values_list('pk', flat=True)
                     k = '%s__pk__in' % k.split("__")[0]
+                else:
+                    k = '%s__in' % k
                 qs = qs.filter(Q(**{k: v}))
         self.query_set = qs.distinct()
         return self.query_set
@@ -652,6 +657,13 @@ class ReportAdmin(object):
 
         return form
 
+    def check_for_widget(self, widget, field):
+        if widget:
+            for field_to_set_widget, widget in widget.iteritems():
+                if field_to_set_widget == field:
+                    return (True, widget, MultipleChoiceField().__class__)
+
+
     def get_form_filter(self, request):
         form_fields = fields_for_model(self.model, [f for f in self.get_query_field_names() if f in self.list_filter])
         if not form_fields:
@@ -697,6 +709,13 @@ class ReportAdmin(object):
                                             
                         else:
                             field = model_field.formfield()
+                            if self.list_filter_widget.has_key(k):
+                                use_widget, widget, field_class = self.check_for_widget(self.list_filter_widget, k)
+                                if use_widget:
+                                    field.__class__ = field_class
+                                    field.widget = widget
+                                    field.choices = model_field.choices
+                                    
                         field.label = force_unicode(_(field.label))
 
                 else:
