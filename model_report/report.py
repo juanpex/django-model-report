@@ -381,8 +381,22 @@ class ReportAdmin(object):
                 if hasattr(v, 'values_list'):
                     v = v.values_list('pk', flat=True)
                     k = '%s__pk__in' % k.split("__")[0]
-                else:
-                    k = '%s__in' % k
+                elif isinstance(v, list):
+                    if len(v) > 1:
+                        k = '%s__in' % k
+                    elif len(v) == 1:
+                        if v[0] == '':
+                            choices = []
+                            for field in self.model_fields:
+                                if field[1] == k:
+                                    for c in field[0].choices:
+                                        choices.append(c[0])
+                            v = choices
+                            k = '%s__in' % k
+                        else:
+                            v = v[0]
+                    else:
+                        pass
                 qs = qs.filter(Q(**{k: v}))
         self.query_set = qs.distinct()
         return self.query_set
@@ -715,6 +729,8 @@ class ReportAdmin(object):
                                     field.__class__ = field_class
                                     field.widget = widget
                                     field.choices = model_field.choices
+                                    field.choices.insert(0, ('', '---------'))
+                                    field.initial = ''
                                     
                         field.label = force_unicode(_(field.label))
 
