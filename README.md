@@ -17,6 +17,17 @@ Documentation
 
 https://django-model-report.readthedocs.org/en/latest/
 
+ForeignKey queryset in main report.py file:
+
+    list_filter_queryset = {
+        'user': {'groups__in': [13, 34]},
+    }
+
+Custom widget:
+
+    list_filter_widget = {
+        'state':  SelectMultiple(),
+    }
 
 Contribute
 ==========
