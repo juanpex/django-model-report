@@ -197,57 +197,57 @@ msgstr "Gruodis"
 #: highcharts/options.py:427
 #: templates/model_report/includes/datepicker_options.html:2
 msgid "Jan"
-msgstr "S"
+msgstr "Sausis"
 
 #: highcharts/options.py:427
 #: templates/model_report/includes/datepicker_options.html:2
 msgid "Feb"
-msgstr "V"
+msgstr "Vasaris"
 
 #: highcharts/options.py:427
 #: templates/model_report/includes/datepicker_options.html:2
 msgid "Mar"
-msgstr "K"
+msgstr "Kovas"
 
 #: highcharts/options.py:427
 #: templates/model_report/includes/datepicker_options.html:2
 msgid "Apr"
-msgstr "B"
+msgstr "Balandis"
 
 #: highcharts/options.py:427
 #: templates/model_report/includes/datepicker_options.html:2
 msgid "Jun"
-msgstr "G"
+msgstr "Birželis"
 
 #: highcharts/options.py:427
 #: templates/model_report/includes/datepicker_options.html:2
 msgid "Jul"
-msgstr "B"
+msgstr "Liepa"
 
 #: highcharts/options.py:427
 #: templates/model_report/includes/datepicker_options.html:2
 msgid "Aug"
-msgstr "L"
+msgstr "Rugpjūtis"
 
 #: highcharts/options.py:427
 #: templates/model_report/includes/datepicker_options.html:2
 msgid "Sep"
-msgstr "R"
+msgstr "Rugsėjis"
 
 #: highcharts/options.py:427
 #: templates/model_report/includes/datepicker_options.html:2
 msgid "Oct"
-msgstr "S"
+msgstr "Spalis"
 
 #: highcharts/options.py:427
 #: templates/model_report/includes/datepicker_options.html:2
 msgid "Nov"
-msgstr "L"
+msgstr "Lapkritis"
 
 #: highcharts/options.py:427
 #: templates/model_report/includes/datepicker_options.html:2
 msgid "Dec"
-msgstr "G"
+msgstr "Gruodis"
 
 #: highcharts/options.py:428
 msgid "Print the chart"
@@ -320,35 +320,35 @@ msgstr "Ataskaitų sąrašas"
 
 #: templates/model_report/includes/datepicker_options.html:3
 msgid "Sun"
-msgstr "Sekm."
+msgstr "S"
 
 #: templates/model_report/includes/datepicker_options.html:3
 msgid "Mon"
-msgstr "Pirm."
+msgstr "P"
 
 #: templates/model_report/includes/datepicker_options.html:3
 msgid "Tue"
-msgstr "Antr."
+msgstr "A"
 
 #: templates/model_report/includes/datepicker_options.html:3
 msgid "Wed"
-msgstr "Treč."
+msgstr "T"
 
 #: templates/model_report/includes/datepicker_options.html:3
 msgid "Thu"
-msgstr "Ketv."
+msgstr "K"
 
 #: templates/model_report/includes/datepicker_options.html:3
 msgid "Fri"
-msgstr "Penkt."
+msgstr "P"
 
 #: templates/model_report/includes/datepicker_options.html:3
 msgid "Sat"
-msgstr "Šeš."
+msgstr "Š"
 
 #: templates/model_report/includes/form_buttons.html:3
 msgid "Send"
-msgstr "Sekm."
+msgstr "Siųsti"
 
 #: templates/model_report/includes/form_config.html:5
 msgid "Config chart by"
