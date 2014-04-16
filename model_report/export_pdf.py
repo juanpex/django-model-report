@@ -22,7 +22,7 @@ def render_to_pdf(report, template_src, context_dict, pdf_encoding='UTF-8'):
     result = StringIO.StringIO()
 
     from xhtml2pdf import pisa
-    pdf = pisa.CreatePDF(StringIO.StringIO(html.encode(pdf_encoding)), result)
+    pdf = pisa.CreatePDF(StringIO.StringIO(html.encode(pdf_encoding)), result, encoding=pdf_encoding)
 
     if not pdf.err:
         response = HttpResponse(result.getvalue(), mimetype='application/pdf')
