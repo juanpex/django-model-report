@@ -15,6 +15,7 @@ from django.forms.models import fields_for_model
 from django.db.models.related import RelatedObject
 from django.db.models import ForeignKey
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.forms import MultipleChoiceField
 from django.forms.widgets import SelectMultiple
 from model_report.utils import base_label, ReportValue, ReportRow
@@ -228,6 +229,8 @@ class ReportAdmin(object):
 
     query_set = None
     """#TODO"""
+
+    always_show_full_username = False
 
     def __init__(self, parent_report=None, request=None):
         self.parent_report = parent_report
@@ -670,7 +673,13 @@ class ReportAdmin(object):
         form.is_valid()
 
         return form
-
+        
+    def get_user_label(self, user):
+        name = user.get_full_name()
+        username = user.username
+        return (name and name != username and '%s (%s)' % (name, username)
+                or username)
+                
     def check_for_widget(self, widget, field):
         if widget:
             for field_to_set_widget, widget in widget.iteritems():
@@ -714,6 +723,9 @@ class ReportAdmin(object):
 
                         elif isinstance(model_field, ForeignKey):
                             field = model_field.formfield()
+
+                            if self.always_show_full_username and (model_field.rel.to == User):
+                                field.label_from_instance = self.get_user_label
 
                             if self.list_filter_queryset:
                                 for query_field, query in self.list_filter_queryset.iteritems():
