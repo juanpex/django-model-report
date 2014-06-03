@@ -559,7 +559,8 @@ class ReportAdmin(object):
 
         if isinstance(context_or_response, HttpResponse):
             return context_or_response
-        return render_to_response('model_report/report.html', context_or_response, context_instance=RequestContext(request))
+        template_name = self.template_name or 'model_report/report.html'
+        return render_to_response(template_name, context_or_response, context_instance=RequestContext(request))
 
     def has_report_totals(self):
         return not (not self.report_totals)
