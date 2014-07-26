@@ -177,7 +177,10 @@ class ReportAdmin(object):
     list_serie_fields = ()
     """List of fields to group by results in chart."""
 
-    template_name = None
+    base_template_name = 'base.html'
+    """Template file name to render the report."""
+
+    template_name = 'model_report/report.html'
     """Template file name to render the report."""
 
     title = None
@@ -483,6 +486,8 @@ class ReportAdmin(object):
                         stylevalue = easyxf('alignment: horizontal left, vertical top;')
                         row_index = 0
                         for index, x in enumerate(column_labels):
+                            # FIXME are we assuming utf-8?
+                            x = unicode(x, 'utf-8')
                             sheet1.write(row_index, index, u'%s' % x, stylebold)
                         row_index += 1
 
@@ -546,6 +551,7 @@ class ReportAdmin(object):
                 'column_labels': column_labels,
                 'report_rows': report_rows,
                 'report_inlines': inlines,
+                'base_template_name': self.base_template_name,
             }
 
             if extra_context:
@@ -561,7 +567,7 @@ class ReportAdmin(object):
 
         if isinstance(context_or_response, HttpResponse):
             return context_or_response
-        return render_to_response('model_report/report.html', context_or_response, context_instance=RequestContext(request))
+        return render_to_response(self.template_name, context_or_response, context_instance=RequestContext(request))
 
     def has_report_totals(self):
         return not (not self.report_totals)
