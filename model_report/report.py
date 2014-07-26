@@ -313,6 +313,8 @@ class ReportAdmin(object):
         value = self.get_value_text(value, index, model_field)
         if value is None or unicode(value) == u'None':
             value = ''
+        if value == [None]:
+            value = []
         return value
 
     def get_grouper_text(self, value, field, model_field):
