@@ -1056,7 +1056,7 @@ class ReportAdmin(object):
                     for index, value in enumerate(resource):
                         if ffields_include_self[index] in self.group_totals:
                             row_group_totals[ffields_include_self[index]].append(value)
-                        if ffields[index] in self.group_totals:
+                        elif ffields[index] in self.group_totals:
                             row_group_totals[ffields[index]].append(value)
                         elif ffields[index] in self.report_totals:
                             row_report_totals[ffields[index]].append(value)
