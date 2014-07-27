@@ -486,8 +486,6 @@ class ReportAdmin(object):
                         stylevalue = easyxf('alignment: horizontal left, vertical top;')
                         row_index = 0
                         for index, x in enumerate(column_labels):
-                            # FIXME are we assuming utf-8?
-                            x = unicode(x, 'utf-8')
                             sheet1.write(row_index, index, u'%s' % x, stylebold)
                         row_index += 1
 
