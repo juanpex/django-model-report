@@ -880,6 +880,7 @@ class ReportAdmin(object):
 
         qs = self.get_query_set(filter_kwargs)
         ffields = [f if 'self.' not in f else 'pk' for f in self.get_query_field_names() if f not in filter_related_fields]
+        ffields_include_self = [f for f in self.get_query_field_names() if f not in filter_related_fields]
         extra_ffield = []
         backend = settings.DATABASES['default']['ENGINE'].split('.')[-1]
         for f in list(ffields):
@@ -1053,6 +1054,8 @@ class ReportAdmin(object):
                 row = ReportRow()
                 if isinstance(resource, (tuple, list)):
                     for index, value in enumerate(resource):
+                        if ffields_include_self[index] in self.group_totals:
+                            row_group_totals[ffields_include_self[index]].append(value)
                         if ffields[index] in self.group_totals:
                             row_group_totals[ffields[index]].append(value)
                         elif ffields[index] in self.report_totals:
