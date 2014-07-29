@@ -177,7 +177,10 @@ class ReportAdmin(object):
     list_serie_fields = ()
     """List of fields to group by results in chart."""
 
-    template_name = None
+    base_template_name = 'base.html'
+    """Template file name to render the report."""
+
+    template_name = 'model_report/report.html'
     """Template file name to render the report."""
 
     title = None
@@ -313,6 +316,8 @@ class ReportAdmin(object):
         value = self.get_value_text(value, index, model_field)
         if value is None or unicode(value) == u'None':
             value = ''
+        if value == [None]:
+            value = []
         return value
 
     def get_grouper_text(self, value, field, model_field):
@@ -544,6 +549,7 @@ class ReportAdmin(object):
                 'column_labels': column_labels,
                 'report_rows': report_rows,
                 'report_inlines': inlines,
+                'base_template_name': self.base_template_name,
             }
 
             if extra_context:
@@ -559,7 +565,7 @@ class ReportAdmin(object):
 
         if isinstance(context_or_response, HttpResponse):
             return context_or_response
-        return render_to_response('model_report/report.html', context_or_response, context_instance=RequestContext(request))
+        return render_to_response(self.template_name, context_or_response, context_instance=RequestContext(request))
 
     def has_report_totals(self):
         return not (not self.report_totals)
@@ -872,6 +878,7 @@ class ReportAdmin(object):
 
         qs = self.get_query_set(filter_kwargs)
         ffields = [f if 'self.' not in f else 'pk' for f in self.get_query_field_names() if f not in filter_related_fields]
+        ffields_include_self = [f for f in self.get_query_field_names() if f not in filter_related_fields]
         extra_ffield = []
         backend = settings.DATABASES['default']['ENGINE'].split('.')[-1]
         for f in list(ffields):
@@ -1045,7 +1052,9 @@ class ReportAdmin(object):
                 row = ReportRow()
                 if isinstance(resource, (tuple, list)):
                     for index, value in enumerate(resource):
-                        if ffields[index] in self.group_totals:
+                        if ffields_include_self[index] in self.group_totals:
+                            row_group_totals[ffields_include_self[index]].append(value)
+                        elif ffields[index] in self.group_totals:
                             row_group_totals[ffields[index]].append(value)
                         elif ffields[index] in self.report_totals:
                             row_report_totals[ffields[index]].append(value)

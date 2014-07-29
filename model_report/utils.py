@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from decimal import Decimal
+from string import capwords
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import force_unicode
 
@@ -9,7 +10,7 @@ def base_label(report, field):
     Basic label
     """
     if hasattr(field, 'verbose_name'):
-        return "%s" % field.verbose_name.title()
+        return "%s" % capwords(field.verbose_name)
     return field
 
 base_lookup_label = lambda report, field: "[%s] %s" % (field.model._meta.verbose_name.title(), field.verbose_name.title())
