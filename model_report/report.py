@@ -780,6 +780,66 @@ class ReportAdmin(object):
     def filter_query(self, qs):
         return qs
 
+    def get_with_dotvalues(self, resources):
+        # {1: 'field.method'}
+        dot_indexes = dict([(index, dot_field) for index, dot_field in enumerate(self.get_fields()) if '.' in dot_field])
+        dot_indexes_values = {}
+
+        dot_model_fields = [(index, model_field[0]) for index, model_field in enumerate(self.model_fields) if index in dot_indexes]
+        # [ 1, model_field] ]
+        for index, model_field in dot_model_fields:
+            model_ids = set([row[index] for row in resources])
+            if isinstance(model_field, (unicode, str)) and 'self.' in model_field:
+                model_qs = self.model.objects.filter(pk__in=model_ids)
+            else:
+                model_qs = model_field.rel.to.objects.filter(pk__in=model_ids)
+            div = {}
+            method_name = dot_indexes[index].split('.')[1]
+            for obj in model_qs:
+                method_value = getattr(obj, method_name)
+                if callable(method_value):
+                    method_value = method_value()
+                div[obj.pk] = method_value
+            dot_indexes_values[index] = div
+            del model_qs
+
+        if dot_indexes_values:
+            new_resources = []
+            for index_row, old_row in enumerate(resources):
+                new_row = []
+                for index, actual_value in enumerate(old_row):
+                    if index in dot_indexes_values:
+                        new_value = dot_indexes_values[index][actual_value]
+                    else:
+                        new_value = actual_value
+                    new_row.append(new_value)
+                new_resources.append(new_row)
+            resources = new_resources
+        return resources
+
+    def compute_row_totals(self, row_config, row_values, is_group_total=False, is_report_total=False):
+        total_row = self.get_empty_row_asdict(self.get_fields(), ReportValue(' '))
+        for k, v in total_row.items():
+            if k in row_config:
+                fun = row_config[k]
+                value = fun(row_values[k])
+                if k in self.get_m2m_field_names():
+                    value = ReportValue([value, ])
+                value = ReportValue(value)
+                value.is_value = False
+                value.is_group_total = is_group_total
+                value.is_report_total = is_report_total
+                if k in self.override_field_values:
+                    value.to_value = self.override_field_values[k]
+                if k in self.override_field_formats:
+                    value.format = self.override_field_formats[k]
+                value.is_m2m_value = (k in self.get_m2m_field_names())
+                total_row[k] = value
+        row = self.reorder_dictrow(total_row)
+        row = ReportRow(row)
+        row.is_total = True
+        return row
+
     def get_rows(self, request, groupby_data=None, filter_kwargs={}, filter_related_fields={}):
         report_rows = []
 
@@ -859,66 +919,6 @@ class ReportAdmin(object):
         qs = qs.values_list(*ffields)
         qs_list = list(qs)
 
-        def get_with_dotvalues(resources):
-            # {1: 'field.method'}
-            dot_indexes = dict([(index, dot_field) for index, dot_field in enumerate(self.get_fields()) if '.' in dot_field])
-            dot_indexes_values = {}
-
-            dot_model_fields = [(index, model_field[0]) for index, model_field in enumerate(self.model_fields) if index in dot_indexes]
-            # [ 1, model_field] ]
-            for index, model_field in dot_model_fields:
-                model_ids = set([row[index] for row in resources])
-                if isinstance(model_field, (unicode, str)) and 'self.' in model_field:
-                    model_qs = self.model.objects.filter(pk__in=model_ids)
-                else:
-                    model_qs = model_field.rel.to.objects.filter(pk__in=model_ids)
-                div = {}
-                method_name = dot_indexes[index].split('.')[1]
-                for obj in model_qs:
-                    method_value = getattr(obj, method_name)
-                    if callable(method_value):
-                        method_value = method_value()
-                    div[obj.pk] = method_value
-                dot_indexes_values[index] = div
-                del model_qs
-
-            if dot_indexes_values:
-                new_resources = []
-                for index_row, old_row in enumerate(resources):
-                    new_row = []
-                    for index, actual_value in enumerate(old_row):
-                        if index in dot_indexes_values:
-                            new_value = dot_indexes_values[index][actual_value]
-                        else:
-                            new_value = actual_value
-                        new_row.append(new_value)
-                    new_resources.append(new_row)
-                resources = new_resources
-            return resources
-
-        def compute_row_totals(row_config, row_values, is_group_total=False, is_report_total=False):
-            total_row = self.get_empty_row_asdict(self.get_fields(), ReportValue(' '))
-            for k, v in total_row.items():
-                if k in row_config:
-                    fun = row_config[k]
-                    value = fun(row_values[k])
-                    if k in self.get_m2m_field_names():
-                        value = ReportValue([value, ])
-                    value = ReportValue(value)
-                    value.is_value = False
-                    value.is_group_total = is_group_total
-                    value.is_report_total = is_report_total
-                    if k in self.override_field_values:
-                        value.to_value = self.override_field_values[k]
-                    if k in self.override_field_formats:
-                        value.format = self.override_field_formats[k]
-                    value.is_m2m_value = (k in self.get_m2m_field_names())
-                    total_row[k] = value
-            row = self.reorder_dictrow(total_row)
-            row = ReportRow(row)
-            row.is_total = True
-            return row
-
         def compute_row_header(row_config):
             header_row = self.get_empty_row_asdict(self.get_fields(), ReportValue(''))
             for k, fun in row_config.items():
@@ -955,7 +955,7 @@ class ReportAdmin(object):
                 values_results.append(key)
             return values_results
 
-        qs_list = get_with_dotvalues(qs_list)
+        qs_list = self.get_with_dotvalues(qs_list)
         if self.model_m2m_fields:
             qs_list = group_m2m_field_values(qs_list)
 
@@ -1012,7 +1012,7 @@ class ReportAdmin(object):
             if row_group_totals:
                 if groupby_data['groupby']:
                     header_group_total = compute_row_header(self.group_totals)
-                    row = compute_row_totals(self.group_totals, row_group_totals, is_group_total=True)
+                    row = self.compute_row_totals(self.group_totals, row_group_totals, is_group_total=True)
                     rows.append(header_group_total)
                     rows.append(row)
                 for k, v in row_group_totals.items():
@@ -1028,7 +1028,7 @@ class ReportAdmin(object):
             report_rows.append([grouper, rows])
         if self.has_report_totals():
             header_report_total = compute_row_header(self.report_totals)
-            row = compute_row_totals(self.report_totals, row_report_totals, is_report_total=True)
+            row = self.compute_row_totals(self.report_totals, row_report_totals, is_report_total=True)
             header_report_total.is_report_totals = True
             row.is_report_totals = True
             report_rows.append([_('Totals'), [header_report_total, row]])
