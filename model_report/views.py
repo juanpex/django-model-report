@@ -13,7 +13,8 @@ def report_list(request):
     context = {
         'report_list': reports.get_reports()
     }
-    return render_to_response('model_report/report_list.html', context, context_instance=RequestContext(request))
+    return render_to_response('model_report/report_list.html', context,
+                              context_instance=RequestContext(request))
 
 
 def report(request, slug):
@@ -21,7 +22,7 @@ def report(request, slug):
     This view render one report
 
     Keywords arguments:
-    
+
     slug -- slug of the report
     """
     report_class = reports.get_report(slug)
@@ -30,6 +31,6 @@ def report(request, slug):
     context = {
         'report_list': reports.get_reports()
     }
-    
+
     report = report_class(request=request)
     return report.render(request, extra_context=context)
