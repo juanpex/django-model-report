@@ -840,6 +840,29 @@ class ReportAdmin(object):
         row.is_total = True
         return row
 
+    def group_m2m_field_values(self, gqs_values):
+        values_results = []
+        m2m_indexes = [index for ffield, lkfield, index, field in self.model_m2m_fields]
+
+        def get_key_values(gqs_vals):
+            return [v if index not in m2m_indexes else None for index, v in enumerate(gqs_vals)]
+
+        # gqs_values needs to already be sorted on the same key function
+        # for groupby to work properly
+        gqs_values.sort(key=get_key_values)
+        res = groupby(gqs_values, key=get_key_values)
+        row_values = {}
+        for key, values in res:
+            row_values = dict([(index, []) for index in m2m_indexes])
+            for v in values:
+                for index in m2m_indexes:
+                    if v[index] not in row_values[index]:
+                        row_values[index].append(v[index])
+            for index, vals in row_values.items():
+                key[index] = vals
+            values_results.append(key)
+        return values_results
+
     def get_rows(self, request, groupby_data=None, filter_kwargs={}, filter_related_fields={}):
         report_rows = []
 
@@ -932,32 +955,9 @@ class ReportAdmin(object):
             row.is_caption = True
             return row
 
-        def group_m2m_field_values(gqs_values):
-            values_results = []
-            m2m_indexes = [index for ffield, lkfield, index, field in self.model_m2m_fields]
-
-            def get_key_values(gqs_vals):
-                return [v if index not in m2m_indexes else None for index, v in enumerate(gqs_vals)]
-
-            # gqs_values needs to already be sorted on the same key function
-            # for groupby to work properly
-            gqs_values.sort(key=get_key_values)
-            res = groupby(gqs_values, key=get_key_values)
-            row_values = {}
-            for key, values in res:
-                row_values = dict([(index, []) for index in m2m_indexes])
-                for v in values:
-                    for index in m2m_indexes:
-                        if v[index] not in row_values[index]:
-                            row_values[index].append(v[index])
-                for index, vals in row_values.items():
-                    key[index] = vals
-                values_results.append(key)
-            return values_results
-
         qs_list = self.get_with_dotvalues(qs_list)
         if self.model_m2m_fields:
-            qs_list = group_m2m_field_values(qs_list)
+            qs_list = self.group_m2m_field_values(qs_list)
 
         groupby_fn = None
         if groupby_data and groupby_data['groupby']:
