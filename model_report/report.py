@@ -385,28 +385,28 @@ class ReportAdmin(object):
         Return the the queryset
         """
         qs = self.model.objects.all()
-        for k, v in filter_kwargs.items():
-            if not v is None and v != '':
-                if hasattr(v, 'values_list'):
-                    v = v.values_list('pk', flat=True)
-                    k = '%s__pk__in' % k.split("__")[0]
-                elif isinstance(v, list):
-                    if len(v) > 1:
-                        k = '%s__in' % k
-                    elif len(v) == 1:
-                        if v[0] == '':
+        for selected_field, field_value in filter_kwargs.items():
+            if not field_value is None and field_value != '':
+                if hasattr(field_value, 'values_list'):
+                    field_value = field_value.values_list('pk', flat=True)
+                    selected_field = '%s__pk__in' % selected_field.split("__")[0]
+                elif isinstance(field_value, list):
+                    if len(field_value) > 1:
+                        selected_field = '%s__in' % selected_field
+                    elif len(field_value) == 1:
+                        if field_value[0] == '':
                             choices = []
                             for field in self.model_fields:
-                                if field[1] == k:
+                                if field[1] == selected_field:
                                     for c in field[0].choices:
                                         choices.append(c[0])
-                            v = choices
-                            k = '%s__in' % k
+                            field_value = choices
+                            selected_field = '%s__in' % selected_field
                         else:
-                            v = v[0]
+                            field_value = field_value[0]
                     else:
                         pass
-                qs = qs.filter(Q(**{k: v}))
+                qs = qs.filter(Q(**{selected_field: field_value}))
         self.query_set = qs.distinct()
         return self.query_set
 
