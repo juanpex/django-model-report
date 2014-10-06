@@ -247,7 +247,7 @@ class ReportAdmin(object):
         for field in self.get_query_field_names():
             try:
                 m2mfields = []
-                if '__' in field:  # IF field has lookup
+                if '__' in field:
                     pre_field = None
                     base_model = self.model
                     for field_lookup in field.split("__"):
@@ -436,21 +436,8 @@ class ReportAdmin(object):
 
             column_labels = self.get_column_names(filter_related_fields)
             report_rows = []
-            groupby_data = None
-            filter_kwargs = None
             report_anchors = []
             chart = None
-
-            context = {
-                'report': self,
-                'form_groupby': form_groupby,
-                'form_filter': form_filter,
-                'form_config': form_config if self.type == 'chart' else None,
-                'chart': chart,
-                'report_anchors': report_anchors,
-                'column_labels': column_labels,
-                'report_rows': report_rows,
-            }
 
             if context_request.GET:
                 groupby_data = form_groupby.get_cleaned_data() if form_groupby else None
@@ -459,7 +446,7 @@ class ReportAdmin(object):
                     self.__dict__.update(groupby_data)
                 else:
                     self.__dict__['onlytotals'] = False
-                report_rows = self.get_rows(context_request, groupby_data, filter_kwargs, filter_related_fields)
+                report_rows = self.get_rows(groupby_data, filter_kwargs, filter_related_fields)
 
                 for g, r in report_rows:
                     report_anchors.append(g)
@@ -521,7 +508,6 @@ class ReportAdmin(object):
                         return response
                     if context_request.GET.get('export') == 'pdf':
                         inlines = [ir(self, context_request) for ir in self.inlines]
-                        report_anchors = None
                         setattr(self, 'is_export', True)
                         context = {
                             'report': self,
@@ -582,20 +568,16 @@ class ReportAdmin(object):
     def get_form_config(self, request):
         ConfigForm.serie_fields = self.get_serie_fields()
         ConfigForm.chart_types = self.chart_types
-        ConfigForm.serie_fields
         form = ConfigForm(data=request.GET or None)
         form.is_valid()
         return form
 
-    # @cache_return
     def get_groupby_fields(self):
         return [(mfield, field, caption) for (mfield, field), caption in zip(self.model_fields, self.get_column_names()) if field in self.list_group_by]
 
-    # @cache_return
     def get_serie_fields(self):
         return [(index, mfield, field, caption) for index, ((mfield, field), caption) in enumerate(zip(self.model_fields, self.get_column_names())) if field in self.list_serie_fields]
 
-    # @cache_return
     def get_form_groupby(self, request):
         groupby_fields = self.get_groupby_fields()
 
@@ -605,7 +587,6 @@ class ReportAdmin(object):
         GroupByForm.groupby_fields = groupby_fields
         form = GroupByForm(data=request.GET or None)
         form.is_valid()
-
         return form
 
     def get_user_label(self, user):
@@ -701,7 +682,6 @@ class ReportAdmin(object):
                         field = v
 
                     if hasattr(field, 'choices'):
-                        # self.override_field_filter_values
                         if not hasattr(field, 'queryset'):
                             if field.choices[0][0]:
                                 field.choices.insert(0, ('', '---------'))
@@ -835,7 +815,7 @@ class ReportAdmin(object):
             attr = attr()
         return attr
 
-    def get_rows(self, request, groupby_data=None, filter_kwargs={}, filter_related_fields={}):
+    def get_rows(self, groupby_data=None, filter_kwargs={}, filter_related_fields={}):
         report_rows = []
 
         for selected_field, field_value in filter_kwargs.items():
@@ -900,7 +880,6 @@ class ReportAdmin(object):
         if self.model_m2m_fields:
             qs_list = self.group_m2m_field_values(qs_list)
 
-        groupby_fn = None
         if groupby_data and groupby_data['groupby']:
             groupby_field = groupby_data['groupby']
             if groupby_field in self.override_group_value:
