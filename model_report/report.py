@@ -829,6 +829,8 @@ class ReportAdmin(object):
                 value.is_value = False
                 value.is_group_total = is_group_total
                 value.is_report_total = is_report_total
+                # TODO: method should do only one thing.
+                # Remove ovveride_field_values from this function.
                 if field in self.override_field_values:
                     value.to_value = self.override_field_values[field]
                 if field in self.override_field_formats:
@@ -851,7 +853,6 @@ class ReportAdmin(object):
         # for groupby to work properly
         gqs_values.sort(key=get_key_values)
         res = groupby(gqs_values, key=get_key_values)
-        row_values = {}
         for key, values in res:
             row_values = dict([(index, []) for index in m2m_indexes])
             for v in values:
@@ -865,12 +866,12 @@ class ReportAdmin(object):
 
     def compute_row_header(self, row_config):
         header_row = self.get_empty_row_asdict(self.get_fields(), ReportValue(''))
-        for k, fun in row_config.items():
+        for report_total_field, fun in row_config.items():
             if hasattr(fun, 'caption'):
                 value = force_unicode(fun.caption)
             else:
                 value = '&nbsp;'
-            header_row[k] = value
+            header_row[report_total_field] = value
         row = self.reorder_dictrow(header_row)
         row = ReportRow(row)
         row.is_caption = True
@@ -897,9 +898,9 @@ class ReportAdmin(object):
     def get_rows(self, request, groupby_data=None, filter_kwargs={}, filter_related_fields={}):
         report_rows = []
 
-        for kwarg, value in filter_kwargs.items():
-            if kwarg in self.override_field_filter_values:
-                filter_kwargs[kwarg] = self.override_field_filter_values.get(kwarg)(self, value)
+        for selected_field, field_value in filter_kwargs.items():
+            if selected_field in self.override_field_filter_values:
+                filter_kwargs[selected_field] = self.override_field_filter_values.get(selected_field)(self, field_value)
 
         qs = self.get_query_set(filter_kwargs)
         ffields = [f if 'self.' not in f else 'pk' for f in self.get_query_field_names() if f not in filter_related_fields]
