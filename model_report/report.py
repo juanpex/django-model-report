@@ -424,7 +424,6 @@ class ReportAdmin(object):
 
     def get_render_context(self, request, extra_context={}, by_row=None):
         context_request = request or self.request
-        related_fields = []
         filter_related_fields = {}
         if self.parent_report and by_row:
             for mfield, cfield, index in self.related_inline_filters:
