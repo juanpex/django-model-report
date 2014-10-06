@@ -819,22 +819,22 @@ class ReportAdmin(object):
 
     def compute_row_totals(self, row_config, row_values, is_group_total=False, is_report_total=False):
         total_row = self.get_empty_row_asdict(self.get_fields(), ReportValue(' '))
-        for k, v in total_row.items():
-            if k in row_config:
-                fun = row_config[k]
-                value = fun(row_values[k])
-                if k in self.get_m2m_field_names():
+        for field in self.get_fields():
+            if field in row_config:
+                fun = row_config[field]
+                value = fun(row_values[field])
+                if field in self.get_m2m_field_names():
                     value = ReportValue([value, ])
                 value = ReportValue(value)
                 value.is_value = False
                 value.is_group_total = is_group_total
                 value.is_report_total = is_report_total
-                if k in self.override_field_values:
-                    value.to_value = self.override_field_values[k]
-                if k in self.override_field_formats:
-                    value.format = self.override_field_formats[k]
-                value.is_m2m_value = (k in self.get_m2m_field_names())
-                total_row[k] = value
+                if field in self.override_field_values:
+                    value.to_value = self.override_field_values[field]
+                if field in self.override_field_formats:
+                    value.format = self.override_field_formats[field]
+                value.is_m2m_value = (field in self.get_m2m_field_names())
+                total_row[field] = value
         row = self.reorder_dictrow(total_row)
         row = ReportRow(row)
         row.is_total = True
