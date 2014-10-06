@@ -876,26 +876,26 @@ class ReportAdmin(object):
         row.is_caption = True
         return row
 
+    def get_field_value(self, obj, field):
+        if isinstance(obj, (dict)):
+            return obj[field]
+        left_field = field.split("__")[0]
+        try:
+            right_field = "__".join(field.split("__")[1:])
+        except:
+            right_field = ''
+        if right_field:
+            return self.get_field_value(getattr(obj, left_field), right_field)
+        if hasattr(obj, 'get_%s_display' % left_field):
+            attr = getattr(obj, 'get_%s_display' % field)
+        else:
+            attr = getattr(obj, field)
+        if callable(attr):
+            attr = attr()
+        return attr
+
     def get_rows(self, request, groupby_data=None, filter_kwargs={}, filter_related_fields={}):
         report_rows = []
-
-        def get_field_value(obj, field):
-            if isinstance(obj, (dict)):
-                return obj[field]
-            left_field = field.split("__")[0]
-            try:
-                right_field = "__".join(field.split("__")[1:])
-            except:
-                right_field = ''
-            if right_field:
-                return get_field_value(getattr(obj, left_field), right_field)
-            if hasattr(obj, 'get_%s_display' % left_field):
-                attr = getattr(obj, 'get_%s_display' % field)
-            else:
-                attr = getattr(obj, field)
-            if callable(attr):
-                attr = attr()
-            return attr
 
         for kwarg, value in filter_kwargs.items():
             if kwarg in self.override_field_filter_values:
@@ -996,7 +996,7 @@ class ReportAdmin(object):
                         row.append(value)
                 else:
                     for index, column in enumerate(ffields):
-                        value = get_field_value(resource, column)
+                        value = self.get_field_value(resource, column)
                         if ffields[index] in self.group_totals:
                             row_group_totals[ffields[index]].append(value)
                         elif ffields[index] in self.report_totals:
