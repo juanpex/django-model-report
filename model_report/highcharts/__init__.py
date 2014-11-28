@@ -12,7 +12,11 @@ def is_numeric(value):
         return False
     return True
 
-from BeautifulSoup import BeautifulStoneSoup
+try:
+    from BeautifulSoup import BeautifulStoneSoup
+except ImportError:
+    from bs4 import BeautifulStoneSoup
+    
 import cgi
 
 
