@@ -11,7 +11,7 @@ env:
     - DB=postgresql DJANGO=1.5.1
 
 install:
-    - pip install -q Django==$DJANGO pisa reportlab html5lib BeautifulSoup psycopg2==2.4.1 xlwt==0.7.4 --use-mirrors
+    - pip install -q Django==$DJANGO pisa reportlab html5lib BeautifulSoup psycopg2==2.4.1 xlwt==0.7.4 xhtml2pdf --use-mirrors
 
 
 before_script:
