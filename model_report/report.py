@@ -149,6 +149,12 @@ def cache_return(fun):
     return wrap
 
 
+def is_date_field(field):
+    """ Returns True if field is DateField or DateTimeField,
+    otherwise False """
+    return isinstance(field, DateField) or isinstance(field, DateTimeField)
+
+
 class ReportAdmin(object):
     """
     Class to represent a Report.
@@ -162,10 +168,10 @@ class ReportAdmin(object):
 
     list_filter = ()
     """List of fields or lookup fields to filter data."""
-    
+
     list_filter_widget = {}
     """Widget for list filter field"""
-    
+
     list_filter_queryset = {}
     """ForeignKey custom queryset"""
 
@@ -259,7 +265,7 @@ class ReportAdmin(object):
                             base_model = pre_field.model
                             pre_field = base_model._meta.get_field_by_name(field_lookup)[0]
                         else:
-                            if 'Date' in unicode(pre_field):
+                            if is_date_field(pre_field):
                                 pre_field = pre_field
                             else:
                                 base_model = pre_field.rel.to
@@ -647,7 +653,7 @@ class ReportAdmin(object):
                                     if query_field == k:
                                         for variable, value in query.iteritems():
                                             field.queryset = field.queryset.filter(**{variable: value})
-                                            
+
                         else:
                             field = model_field.formfield()
                             if self.list_filter_widget.has_key(k):
@@ -658,7 +664,7 @@ class ReportAdmin(object):
                                     field.choices = model_field.choices
                                     field.choices.insert(0, ('', '---------'))
                                     field.initial = ''
-                                    
+
                         field.label = force_unicode(_(field.label))
 
                 else:
@@ -831,7 +837,7 @@ class ReportAdmin(object):
             if '__' in f:
                 for field, name in self.model_fields:
                     if name == f:
-                        if 'fields.Date' in unicode(field):
+                        if is_date_field(field):
                             fname, flookup = f.rsplit('__', 1)
                             fname = fname.split('__')[-1]
                             if not flookup in ('year', 'month', 'day'):
