@@ -258,8 +258,8 @@ class ReportAdmin(object):
                     base_model = self.model
                     for field_lookup in field.split("__"):
                         if not pre_field:
-                            pre_field = base_model._meta.get_field_by_name(field_lookup)[0]
-                            if 'ManyToManyField' in unicode(pre_field) or isinstance(pre_field, RelatedObject):
+                            pre_field, _, _, is_m2m = base_model._meta.get_field_by_name(field_lookup)
+                            if is_m2m:
                                 m2mfields.append(pre_field)
                         elif isinstance(pre_field, RelatedObject):
                             base_model = pre_field.model
