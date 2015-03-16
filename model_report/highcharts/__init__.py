@@ -16,7 +16,7 @@ try:
     from BeautifulSoup import BeautifulStoneSoup
 except ImportError:
     from bs4 import BeautifulStoneSoup
-    
+
 import cgi
 
 
@@ -115,7 +115,7 @@ class HighchartRender(object):
 
         serie_data = []
         xAxis_categories = []
-        yAxis_min = 0
+        yAxis_min = 0.
         for grouper, rows in report_rows:
             add_group = True
             if self.config['has_report_totals']:
@@ -135,7 +135,7 @@ class HighchartRender(object):
             grouper = unicodeToHTMLEntities(grouper)
             serie_data.append(round(value, 2))
             xAxis_categories.append(grouper)
-            yAxis_min = yAxis_min if value > yAxis_min else value
+            yAxis_min = float(yAxis_min) if value > yAxis_min else value
         data = self.model.serie_obj.create(**{
             'name': grouper,
             'data': serie_data,
@@ -223,7 +223,7 @@ class HighchartRender(object):
             from django.utils import simplejson
         except ImportError:
             import json as simplejson
-            
+
         json = unicode(self.model)
         json = simplejson.dumps(json)[1:-1]
         json = json.replace("'true'", 'true')
