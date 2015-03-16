@@ -371,7 +371,9 @@ class ReportAdmin(object):
         for field, field_name in self.model_fields:
             if field_name in ignore_columns:
                 continue
-            caption = self.override_field_labels.get(field_name, base_label)(self, field)
+            caption = self.override_field_labels.get(field_name, base_label)
+            if hasattr(caption, '__call__'):  # Is callable
+                caption = caption(self, field)
             values.append(caption)
         return values
 
