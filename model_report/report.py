@@ -629,7 +629,8 @@ class ReportAdmin(object):
                     pre_field = None
                     base_model = self.model
                     if '__' in k:
-                        for field_lookup in k.split("__")[:-1]:
+                        # for field_lookup in k.split("__")[:-1]:
+                        for field_lookup in k.split("__"):
                             if pre_field:
                                 if isinstance(pre_field, RelatedObject):
                                     base_model = pre_field.model
