@@ -240,6 +240,10 @@ class ReportAdmin(object):
     query_set = None
     """#TODO"""
 
+    extra_fields = {}
+    """ Dictionary of fields that are aggregated to the query.
+    Format {field_name: Field instance}"""
+
     always_show_full_username = False
 
     def __init__(self, parent_report=None, request=None):
@@ -272,7 +276,9 @@ class ReportAdmin(object):
                                 pre_field = base_model._meta.get_field_by_name(field_lookup)[0]
                     model_field = pre_field
                 else:
-                    if not 'self.' in field:
+                    if field in self.extra_fields:
+                        model_field = self.extra_fields[field]
+                    elif not 'self.' in field:
                         model_field = self.model._meta.get_field_by_name(field)[0]
                     else:
                         get_attr = lambda s: getattr(s, field.split(".")[1])
