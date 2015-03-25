@@ -560,12 +560,19 @@ class ReportAdmin(object):
         finally:
             globals()['_cache_class'] = {}
 
+    def check_permissions(self, request):
+        """ Override this method to another one raising Forbidden
+        exceptions if you want to limit the access to the report """
+
+
     def render(self, request, extra_context={}):
         context_or_response = self.get_render_context(request, extra_context)
+        self.check_permissions(request)
 
         if isinstance(context_or_response, HttpResponse):
             return context_or_response
-        return render_to_response(self.template_name, context_or_response, context_instance=RequestContext(request))
+        return render_to_response(self.template_name, context_or_response,
+                                  context_instance=RequestContext(request))
 
     def has_report_totals(self):
         return not (not self.report_totals)
