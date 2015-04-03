@@ -112,6 +112,12 @@ def cache_return(fun):
     return wrap
 
 
+def is_date_field(field):
+    """ Returns True if field is DateField or DateTimeField,
+    otherwise False """
+    return isinstance(field, DateField) or isinstance(field, DateTimeField)
+
+
 class ReportAdmin(object):
     """
     Class to represent a Report.
@@ -125,10 +131,10 @@ class ReportAdmin(object):
 
     list_filter = ()
     """List of fields or lookup fields to filter data."""
-    
+
     list_filter_widget = {}
     """Widget for list filter field"""
-    
+
     list_filter_queryset = {}
     """ForeignKey custom queryset"""
 
@@ -202,6 +208,10 @@ class ReportAdmin(object):
     query_set = None
     """#TODO"""
 
+    extra_fields = {}
+    """ Dictionary of fields that are aggregated to the query.
+    Format {field_name: Field instance}"""
+
     always_show_full_username = False
 
     def __init__(self, parent_report=None, request=None):
@@ -220,21 +230,23 @@ class ReportAdmin(object):
                     base_model = self.model
                     for field_lookup in field.split("__"):
                         if not pre_field:
-                            pre_field = base_model._meta.get_field_by_name(field_lookup)[0]
-                            if 'ManyToManyField' in unicode(pre_field) or isinstance(pre_field, RelatedObject):
+                            pre_field, _, _, is_m2m = base_model._meta.get_field_by_name(field_lookup)
+                            if is_m2m:
                                 m2mfields.append(pre_field)
                         elif isinstance(pre_field, RelatedObject):
                             base_model = pre_field.model
                             pre_field = base_model._meta.get_field_by_name(field_lookup)[0]
                         else:
-                            if 'Date' in unicode(pre_field):
+                            if is_date_field(pre_field):
                                 pre_field = pre_field
                             else:
                                 base_model = pre_field.rel.to
                                 pre_field = base_model._meta.get_field_by_name(field_lookup)[0]
                     model_field = pre_field
                 else:
-                    if not 'self.' in field:
+                    if field in self.extra_fields:
+                        model_field = self.extra_fields[field]
+                    elif not 'self.' in field:
                         model_field = self.model._meta.get_field_by_name(field)[0]
                     else:
                         get_attr = lambda s: getattr(s, field.split(".")[1])
@@ -333,7 +345,9 @@ class ReportAdmin(object):
         for field, field_name in self.model_fields:
             if field_name in ignore_columns:
                 continue
-            caption = self.override_field_labels.get(field_name, base_label)(self, field)
+            caption = self.override_field_labels.get(field_name, base_label)
+            if hasattr(caption, '__call__'):  # Is callable
+                caption = caption(self, field)
             values.append(caption)
         return values
 
@@ -467,12 +481,19 @@ class ReportAdmin(object):
         finally:
             globals()['_cache_class'] = {}
 
+    def check_permissions(self, request):
+        """ Override this method to another one raising Forbidden
+        exceptions if you want to limit the access to the report """
+
+
     def render(self, request, extra_context={}):
         context_or_response = self.get_render_context(request, extra_context)
+        self.check_permissions(request)
 
         if isinstance(context_or_response, HttpResponse):
             return context_or_response
-        return render_to_response(self.template_name, context_or_response, context_instance=RequestContext(request))
+        return render_to_response(self.template_name, context_or_response,
+                                  context_instance=RequestContext(request))
 
     def has_report_totals(self):
         return not (not self.report_totals)
@@ -536,7 +557,8 @@ class ReportAdmin(object):
                     pre_field = None
                     base_model = self.model
                     if '__' in k:
-                        for field_lookup in k.split("__")[:-1]:
+                        # for field_lookup in k.split("__")[:-1]:
+                        for field_lookup in k.split("__"):
                             if pre_field:
                                 if isinstance(pre_field, RelatedObject):
                                     base_model = pre_field.model
@@ -568,7 +590,7 @@ class ReportAdmin(object):
                                     if query_field == k:
                                         for variable, value in query.iteritems():
                                             field.queryset = field.queryset.filter(**{variable: value})
-                                            
+
                         else:
                             field = model_field.formfield()
                             if self.list_filter_widget.has_key(k):
@@ -579,7 +601,7 @@ class ReportAdmin(object):
                                     field.choices = model_field.choices
                                     field.choices.insert(0, ('', '---------'))
                                     field.initial = ''
-                                    
+
                         field.label = force_unicode(_(field.label))
 
                 else:
@@ -752,7 +774,7 @@ class ReportAdmin(object):
             if '__' in f:
                 for field, name in self.model_fields:
                     if name == f:
-                        if 'fields.Date' in unicode(field):
+                        if is_date_field(field):
                             fname, flookup = f.rsplit('__', 1)
                             fname = fname.split('__')[-1]
                             if not flookup in ('year', 'month', 'day'):
