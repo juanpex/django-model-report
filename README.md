@@ -1,3 +1,6 @@
+ 
+
+
 Django Model Report
 ===================
 
@@ -5,6 +8,9 @@ django-model-report is a Django application and library for reports integrated w
 
 
 [![Build Status](https://travis-ci.org/juanpex/django-model-report.png)](https://travis-ci.org/juanpex/django-model-report)
+
+now maintained by  [@jelenak](https://github.com/jelenak "@jelenak")
+--------------------------------------------------------------------
 
 Demo
 ====
