@@ -32,7 +32,7 @@ class PdfExporter(Exporter):
         pdf = pisa.CreatePDF(StringIO.StringIO(html.encode(pdf_encoding)), result, encoding=pdf_encoding)
 
         if not pdf.err:
-            response = HttpResponse(result.getvalue(), mimetype='application/pdf')
+            response = HttpResponse(result.getvalue(), content_type='application/pdf')
             response['Content-Disposition'] = 'attachment; filename=%s.pdf' % report.slug
         else:
             response = HttpResponse('We had some errors<pre>%s</pre>' % escape(html))
