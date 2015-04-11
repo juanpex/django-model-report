@@ -82,7 +82,7 @@ class ExcelExporter(Exporter):
                         sheet1.write(row_index + 1, index, ' ')
                     row_index += 2
 
-        response = HttpResponse(mimetype="application/ms-excel")
+        response = HttpResponse(content_type="application/ms-excel")
         response['Content-Disposition'] = 'attachment; filename=%s.xls' % report.slug
         book.save(response)
         return response
