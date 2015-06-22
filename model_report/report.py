@@ -12,7 +12,10 @@ from django.utils.encoding import force_unicode
 from django.db.models import Q
 from django import forms
 from django.forms.models import fields_for_model
-from django.db.models.related import RelatedObject
+try:
+    from django.db.models.fields.related import ForeignObjectRel
+except ImportError:  # Django < 1.8
+    from django.db.models.related import RelatedObject as ForeignObjectRel
 from django.db.models import ForeignKey
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -233,7 +236,7 @@ class ReportAdmin(object):
                             pre_field, _, _, is_m2m = base_model._meta.get_field_by_name(field_lookup)
                             if is_m2m:
                                 m2mfields.append(pre_field)
-                        elif isinstance(pre_field, RelatedObject):
+                        elif isinstance(pre_field, ForeignObjectRel):
                             base_model = pre_field.model
                             pre_field = base_model._meta.get_field_by_name(field_lookup)[0]
                         else:
@@ -560,7 +563,7 @@ class ReportAdmin(object):
                         # for field_lookup in k.split("__")[:-1]:
                         for field_lookup in k.split("__"):
                             if pre_field:
-                                if isinstance(pre_field, RelatedObject):
+                                if isinstance(pre_field, ForeignObjectRel):
                                     base_model = pre_field.model
                                 else:
                                     base_model = pre_field.rel.to
