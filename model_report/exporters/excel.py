@@ -58,7 +58,7 @@ class ExcelExporter(Exporter):
 
         for g, rows in report_rows:
             if g:
-                sheet1.write(row_index, 0, u'%s' % x, stylebold)
+                sheet1.write(row_index, 0, u'%s' % g, stylebold)
                 row_index += 1
             for row in list(rows):
                 if row.is_value():
