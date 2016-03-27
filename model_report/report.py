@@ -37,7 +37,7 @@ except:
     OrderedDict = dict  # pyflakes:ignore
 
 
-def autodiscover():
+def autodiscover(module_name='reports.py'):
     """
     Auto-discover INSTALLED_APPS report.py modules and fail silently when
     not present. Borrowed form django.contrib.admin
@@ -53,7 +53,7 @@ def autodiscover():
         # Attempt to import the app's admin module.
         try:
             before_import_registry = copy.copy(reports)
-            import_module('%s.reports' % app)
+            import_module('%s.%s' % (app, module_name))
         except:
             # Reset the model registry to the state before the last import as
             # this import will have to reoccur on the next request and this
@@ -64,7 +64,7 @@ def autodiscover():
             # Decide whether to bubble up this error. If the app just
             # doesn't have an admin module, we can ignore the error
             # attempting to import it, otherwise we want it to bubble up.
-            if module_has_submodule(mod, 'reports'):
+            if module_has_submodule(mod, module_name):
                 raise
 
 
