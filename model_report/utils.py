@@ -3,6 +3,7 @@ from decimal import Decimal
 from string import capwords
 from django.utils.translation import ugettext_lazy as _
 from django.utils.encoding import force_unicode
+from django.utils import timezone
 
 
 def base_label(report, field):
@@ -52,7 +53,7 @@ def date_format(value, instance):
     """
     Format cell value to friendly date string
     """
-    return value.strftime("%d/%m/%Y")
+    return timezone.localtime(value).strftime("%d/%m/%Y")
 
 
 def usd_format(value, instance):
