@@ -322,6 +322,11 @@ class ReportAdmin(object):
                     value = getattr(obj, 'get_%s_display' % field)()
         except:
             pass
+
+        if field in self.override_field_formats:
+            value = ReportValue(value)
+            value.format = self.override_field_formats[field]
+
         return value
 
     # @cache_return
