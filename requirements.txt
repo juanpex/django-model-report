@@ -1,4 +1,4 @@
-django==1.4
+django==1.11.23
 reportlab
 html5lib
 BeautifulSoup
