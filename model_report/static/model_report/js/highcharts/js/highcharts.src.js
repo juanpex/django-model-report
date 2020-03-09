@@ -433,7 +433,7 @@ function getPosition(el) {
 }
 
 /**
- * Helper class that contains variuos counters that are local to the chart.
+ * Helper class that contains various counters that are local to the chart.
  */
 function ChartCounters() {
 	this.color = 0;
