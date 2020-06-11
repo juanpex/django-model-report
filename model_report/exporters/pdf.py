@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 import cStringIO as StringIO
-from cgi import escape
+
+try:
+    from cgi import escape
+except ImportError:
+    from html import escape
+
 from xhtml2pdf import pisa
 
 from django.template.loader import get_template
